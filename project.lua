@@ -29,9 +29,9 @@ p =
   id = genid(),
   item = Item.Person,
   name = 'RP',
-  decription = 'Roman Pavlyuk, CTO, характєр мєрзкій, нє женат'
+  description = 'Roman Pavlyuk, CTO, характєр мєрзкій, нє женат'
 }
-
+table.insert(People, p)
 
 t =
 {
@@ -100,9 +100,27 @@ local function showHelp()
   print('HELP !!!!!!!')
 end
 
+local function showList()
+  print(hl.Cls())
+  print"LIST!!!!"
+end
 
-makeChord('?', showHelp, 'Show chords help')
+local function listPeople(people)
+  if people == nil then people = People end
 
+  for i, p in ipairs(people) do
+    print(i .. ". " .. p.name .. "\t\t" .. hl.Faint() .. p.description .. hl.Off())
+  end
+
+end
+
+
+local function hlRedUnderlined(s) return hl.Red() .. hl.Underline() .. s .. hl.Off() end
+
+makeChord('?', showHelp, "Show chords help")
+
+makeChord('l', showList, "List: " .. hlRedUnderlined('p') .. "eople, tasks,..", true)
+makeChord('lp', listPeople, "List people")
 
 
 do
