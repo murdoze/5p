@@ -2,8 +2,11 @@ local pp, inkey, push = unpack(require 'lib/all')
 
 local hl = require'highlight'
 local genid = require'genid'
+local nonnull = require'nonnull'
 
 require'noglobals'
+
+
 
 -- Data Model
 
@@ -24,14 +27,37 @@ local Tasks = {}
 
 local p, t, c, m, d
 
+--- People
+
 p =
 {
   id = genid(),
   item = Item.Person,
   name = 'RP',
-  description = 'Roman Pavlyuk, CTO, характєр мєрзкій, нє женат'
+  text = 'Roman Pavlyuk, CTO, характєр мєрзкій, нє женат'
 }
 table.insert(People, p)
+
+p =
+{
+  id = genid(),
+  item = Item.Person,
+  name = 'AL',
+  text = 'Anton Lutsyshyn, фізик-самогонщик, характєр мєрзкій, нє женат'
+}
+table.insert(People, p)
+
+
+--- Tasks
+
+t =
+{
+  id = genid(),
+  item = Item.Task,
+  text = 'Gimbal'
+}
+table.insert(Tasks, t)
+
 
 t =
 {
@@ -46,8 +72,8 @@ local current_chord = ''
 
 local chords = {}
 
-local function makeChord(chord, func, description, continue_chord)
-  chords[chord] = { func =  func, description = description, continue = continue_chord }
+local function makeChord(chord, func, text, continue_chord)
+  chords[chord] = { func =  func, text = text, continue = continue_chord }
 end
 
 local function charsFor(key)
@@ -105,13 +131,16 @@ local function showList()
   print"LIST!!!!"
 end
 
-local function listPeople(people)
-  if people == nil then people = People end
+local function showItems(items)
+  items = nonnull.list(items)
 
-  for i, p in ipairs(people) do
-    print(i .. ". " .. p.name .. "\t\t" .. hl.Faint() .. p.description .. hl.Off())
+  for i, it in ipairs(items) do
+    print(i .. ". " .. nonnull.value(it.name, '?UNKNOWN?') .. "\t\t" .. hl.Faint() .. nonnull.value(it.text, '') .. hl.Off())
   end
+end
 
+local function listPeople(people)
+  showItems(nonnull.value(people, People))
 end
 
 
@@ -121,6 +150,7 @@ makeChord('?', showHelp, "Show chords help")
 
 makeChord('l', showList, "List: " .. hlRedUnderlined('p') .. "eople, tasks,..", true)
 makeChord('lp', listPeople, "List people")
+makeChord('lt', function() showItems(Tasks) end, "List tasks")
 
 
 do
