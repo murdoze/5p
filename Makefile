@@ -1,0 +1,2 @@
+all:
+	lua project.lua
