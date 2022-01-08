@@ -30,10 +30,10 @@ end
 setmetatable(hl, mt)
 
 local function seq(t, term)
-	local CSI = '\27['
-	if term == nil then term = 'm' end
-
 	if hl.enabled then
+		local CSI = '\27['
+		if term == nil then term = 'm' end
+
 		return CSI .. table.concat(t, ";") .. term
 	else
 		return ''
@@ -207,5 +207,8 @@ hl.printColorTable = function()
 	end
 end
 
+-- Length of teh string not counting control character
+hl.strlen = function(s)
+end
 
 return hl
