@@ -3,6 +3,10 @@ local pp, inkey, push = unpack(require 'lib/all')
 local hl = require'highlight'
 local genid = require'genid'
 local nonnull = require'nonnull'
+local serpent = require'serpent'
+
+local display=require'display'
+
 
 require'noglobals'
 
@@ -54,16 +58,16 @@ t =
 {
   id = genid(),
   item = Item.Task,
-  text = 'Gimbal'
+  text = 'Gimbal',
+  assigned_to = p,
 }
 table.insert(Tasks, t)
 
 
-t =
-{
-    id = genid()
-}
-
+local t_ser = serpent.dump(t)
+pp"======= TASK ==================================="
+print(t_ser)
+pp"================================================"
 
 
 -- Chord processing
@@ -118,16 +122,36 @@ local function chordFor(key)
   end
 end
 
--- Chords
+-- Displays
+
+local function set_current_screen(func)
+  display.current_screen = func
+end
+
+local function show_header()
+  print(hl.Locate(display.header_line, 1)())
+  display.print_line(hl.White() .. hl.BgRed() .. "5p — Personal Portable Project Planning Paradise" .. hl.Off())
+end
+
+local function show_line_numbers()
+  for i = display.list_begin_line,display.list_end_line do
+    print(hl.Locate(i, 1)())
+    display.print_line(string.format("%2d", i) .. ". ")
+  end
+end
+
+local function show_status()
+  print(hl.Locate(display.status_line, 1)())
+  print(hl.White() .. hl.BgBlue() .. " Status normal" .. hl.Off())
+end
+
 
 local function showHelp()
-  print(hl.Cls())
   print(hl.Locate(15, 50)() .. "HELP !!!!")
   print('HELP !!!!!!!')
 end
 
 local function showList()
-  print(hl.Cls())
   print"LIST!!!!"
 end
 
@@ -146,11 +170,11 @@ end
 
 local function hlRedUnderlined(s) return hl.Red() .. hl.Underline() .. s .. hl.Off() end
 
-makeChord('?', showHelp, "Show chords help")
+makeChord('?', function() set_current_screen(showHelp) end, "Show chords help")
 
-makeChord('l', showList, "List: " .. hlRedUnderlined('p') .. "eople, tasks,..", true)
-makeChord('lp', listPeople, "List people")
-makeChord('lt', function() showItems(Tasks) end, "List tasks")
+makeChord('l', function() set_current_screen(showList) end, "List: " .. hlRedUnderlined('p') .. "eople, tasks,..", true)
+makeChord('lp', function() set_current_screen(listPeople) end, "List people")
+makeChord('lt', function() set_current_screen(function() showItems(Tasks) end) end, "List tasks")
 
 
 do
@@ -159,6 +183,11 @@ do
   local chord = nil
 
   while chars ~= 'q' do
+
+    display.show_header = show_header
+    display.show_status = show_status
+
+    display.draw()
  
     key = inkey()
     print(hl.Cls())
