@@ -14,6 +14,17 @@ end
 
 --
 
+string.pad = function(s, width, char)
+  local pad = width - string.len(s)
+  if pad > 0 then
+    if char == nil then char = ' ' end
+    return s .. string.rep(char, pad)
+  else
+    return s
+  end
+end
+
+--
 
 local serpent = require'serpent'
 local pp = function(_) print(serpent.block(_, {nocode = true, sortkeys = true, comment = false})) end
