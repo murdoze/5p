@@ -64,10 +64,10 @@ t =
 table.insert(Tasks, t)
 
 
-local t_ser = serpent.dump(t)
-pp"======= TASK ==================================="
-print(t_ser)
-pp"================================================"
+-- local t_ser = serpent.dump(t)
+-- pp"======= TASK ==================================="
+-- print(t_ser)
+-- pp"================================================"
 
 
 -- Chord processing
@@ -101,7 +101,7 @@ local function chordFor(key)
   local chars = charsFor(key)
   current_chord = current_chord .. chars
 
-  print("==>" .. current_chord .. "<==")
+  -- print("==>" .. current_chord .. "<==")
 
   local chord = chords[current_chord]
 
@@ -128,53 +128,84 @@ local function set_current_screen(func)
   display.current_screen = func
 end
 
+local function show_ruler()
+  local r10 = "" 
+  local r01 = ""
+  for i = 0, 99 do
+    if i % 10 == 0 then r10 = r10 .. string.char(i / 10 + string.byte('0')) else r10 = r10 .. " " end
+    r01 = r01 .. string.char(i % 10 + string.byte('0'))
+  end
+
+
+  display.locate(1)
+  display.print_line(hl.BgBlue() .. r10)
+  display.locate(2)
+  display.print_line(hl.BgYellow() .. r01)
+end
+
+local function show_title(s)
+  local col = math.floor(display.width / 2 - string.len(s) / 2)
+
+  display.locate(display.title_line, col)
+  display.print(hl.BgCyan() .. hl.White() .. s .. " " .. hl.Off())
+end
+
 local function show_header()
-  print(hl.Locate(display.header_line, 1)())
-  display.print_line(hl.White() .. hl.BgRed() .. "5p — Personal Portable Project Planning Paradise" .. hl.Off())
+  show_ruler()
+  display.print(hl.Locate(display.header_line, 1)())
+  display.print_line(hl.White() .. hl.BgRed() .. "5p — Personal Portable Project Planning Paradise")
 end
 
 local function show_line_numbers()
   for i = display.list_begin_line,display.list_end_line do
-    print(hl.Locate(i, 1)())
-    display.print_line(string.format("%2d", i) .. ". ")
+    display.locate(i)
+    display.print_line(string.format("%2d", i) .. ". " .. hl.BgYellow())
   end
 end
 
 local function show_status()
-  print(hl.Locate(display.status_line, 1)())
-  print(hl.White() .. hl.BgBlue() .. " Status normal" .. hl.Off())
+  display.locate(display.status_line)
+  display.print_line(hl.White() .. hl.BgBlue() .. " Status normal")
 end
 
 
-local function showHelp()
-  print(hl.Locate(15, 50)() .. "HELP !!!!")
-  print('HELP !!!!!!!')
+local function show_help()
+  show_title('HELP !!!!!!!')
 end
 
-local function showList()
-  print"LIST!!!!"
+local function show_list()
+  show_title"LIST!!!!"
+  -- show_line_numbers()
 end
 
-local function showItems(items)
+local function show_items(items)
   items = nonnull.list(items)
 
   for i, it in ipairs(items) do
-    print(i .. ". " .. nonnull.value(it.name, '?UNKNOWN?') .. "\t\t" .. hl.Faint() .. nonnull.value(it.text, '') .. hl.Off())
+    display.locate(display.list_begin_line + i - 1)
+    display.print(i .. ". " .. nonnull.value(it.name, '?UNKNOWN?') .. "\t\t" .. hl.Faint() .. nonnull.value(it.text, '') .. hl.Off() .. "\n")
   end
 end
 
-local function listPeople(people)
-  showItems(nonnull.value(people, People))
+local function show_people_list(people)
+  show_title"People"
+  show_items(nonnull.value(people, People))
+end
+
+local function show_task_list(tasks)
+  show_title("AAAAAAA")
+  show_title("AAAAAAA")
+  show_items(nonnull.value(tasks, Tasks))
 end
 
 
 local function hlRedUnderlined(s) return hl.Red() .. hl.Underline() .. s .. hl.Off() end
 
-makeChord('?', function() set_current_screen(showHelp) end, "Show chords help")
+makeChord('?', function() set_current_screen(show_help) end, "Show chords help")
 
-makeChord('l', function() set_current_screen(showList) end, "List: " .. hlRedUnderlined('p') .. "eople, tasks,..", true)
-makeChord('lp', function() set_current_screen(listPeople) end, "List people")
-makeChord('lt', function() set_current_screen(function() showItems(Tasks) end) end, "List tasks")
+makeChord('l', function() set_current_screen(show_list) end, "List: " .. hlRedUnderlined('p') .. "eople, tasks,..", true)
+makeChord('lp', function() set_current_screen(show_people_list) end, "List people")
+makeChord('lt', function() set_current_screen(show_task_list) end, "List tasks")
 
 
 do
