@@ -1,86 +1,30 @@
 local pp, inkey, push = unpack(require 'lib/all')
 
 local hl = require'highlight'
-local genid = require'genid'
 local nonnull = require'nonnull'
 local serpent = require'serpent'
 
-local display=require'display'
+local display = require'display'
 
+local data = require'data'
+local serdes = require'serdes'
 
 require'noglobals'
 
+-- Project
 
+local project = {}
 
--- Data Model
+project.dir = "./examples/project1/"
 
-local Item = 
-{
-  Person = 'PERSON',
-  Task = 'TASK',
-  Customer = 'CUSTOMER',
-  Milestone = 'MILESTONE',
-  Drone = 'DRONE',
-
-}
-
-local People = {}
-local Tasks = {}
-
--- Data Base
-
-local p, t, c, m, d
-
---- People
-
-p =
-{
-  id = genid(),
-  item = Item.Person,
-  name = 'RP',
-  -- text = 'Roman Pavlyuk, CTO, характєр мєрзкій, нє женат'
-  text = 'Roman Pavlyuk, CTO, a very inteligent and self-loving human being, a dream of every woman'
-}
-table.insert(People, p)
-
-p =
-{
-  id = genid(),
-  item = Item.Person,
-  name = 'AL',
-  text = 'Anton Lutsyshyn, let the moon shine and let the circuits blow!'
-}
-table.insert(People, p)
-
-
---- Tasks
-
-t =
-{
-  id = genid(),
-  item = Item.Task,
-  text = 'Gimbal',
-  assigned_to = p,
-}
-table.insert(Tasks, t)
-
-  for i=1,10000 do
-  t =
-  {
-    id = genid(),
-    item = Item.Task,
-    text = 'Task #' .. tostring(i+1) .. ": this is a very important task, a very long line, and overall life is suffering and we all shall eventually die",
-    assigned_to = p,
-  }
-  table.insert(Tasks, t)
+local function save_data()
+  display.locate(10, 10)
+  display.print_line(hl.Red() .. "Saving to " .. project.dir .. hl.Off())
+  serdes.save_dir(project.dir, data)
+  display.locate(11, 10)
+  display.print_line(hl.Red() .. "Saved to " .. project.dir .. hl.Off())
+  inkey()
 end
-
-
--- local t_ser = serpent.dump(t)
--- pp"======= TASK ==================================="
--- print(t_ser)
--- pp"================================================"
-
 
 -- Chord processing
 
@@ -88,12 +32,12 @@ local current_chord = ''
 
 local chords = {}
 
-local function makeChord(chord, func, text, continue_chord)
+local function make_chord(chord, func, text, continue_chord)
   chords[chord] = { func =  func, text = text, continue = continue_chord }
 end
 
 local function charsFor(key)
-  local keymap=
+  local keymap =
   {
   }
 
@@ -140,6 +84,43 @@ local function set_current_screen(func)
   display.current_screen = func
 end
 
+local function show_border()
+-- print'\27(0 q x l m k j    \27(B'
+-- ─ │ ┌ └ ┐ ┘    
+
+  display.locate(1, 1)
+  display.print'\27(0' 
+
+  display.print'l'
+  display.print(string.rep('q', display.width-2))
+  display.print'k'
+
+  display.print'\27(B' 
+
+  for i = 2, display.height - 1 do
+    display.locate(i, 1)
+    display.print'\27(0' 
+    display.print'x'
+    display.print'\27(B' 
+
+    display.locate(i, display.width)
+    display.print'\27(0' 
+    display.print'x'
+    display.print'\27(B' 
+
+  end
+
+
+  display.locate(display.height, 1)
+  display.print'\27(0' 
+
+  display.print'm'
+  display.print(string.rep('q', display.width-2))
+  display.print'j'
+
+  display.print'\27(B' 
+end
+
 local function show_ruler()
   local r10 = "" 
   local r01 = ""
@@ -150,9 +131,9 @@ local function show_ruler()
 
 
   display.locate(1)
-  display.print_line(hl.BgBlue() .. r10)
+  -- display.print_line(hl.BgBlue() .. r10)
   display.locate(2)
-  display.print_line(hl.BgYellow() .. r01)
+  -- display.print_line(hl.BgYellow() .. r01)
 end
 
 local function show_title(s)
@@ -164,7 +145,7 @@ end
 
 local function show_header()
   show_ruler()
-  display.print(hl.Locate(display.header_line, 1)())
+  display.locate(display.header_line)
   display.print_line(hl.White() .. hl.BgRed() .. "5p: Personal Portable Project Planning Paradise")
 end
 
@@ -195,13 +176,9 @@ local function show_items(items)
 
   local lines = display.list_end_line - display.list_begin_line + 1
 
-  display.locate(display.list_begin_line)
-  display.print_line(hl.Yellow() .. "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789")
-
   for i, it in ipairs(items) do
-    display.locate(display.list_begin_line + i - 1 + 1)
-    display.print_line(hl.Yellow() .. string.format("%3d", i) .. hl.Off() .. ". " .. hl.align(nonnull.value(it.name, '?UNKNOWN?'), 20) .. " " .. hl.Faint() .. nonnull.value(it.text, ''))
-    --display.print_line(hl.Yellow() .. string.format("%3d", i) .. hl.Off() .. ". " .. nonnull.value(it.name, '?UNKNOWN?') .. " " .. hl.Faint() .. nonnull.value(it.text, ''))
+    display.locate(display.list_begin_line + i - 1)
+    display.print_line(hl.Yellow() .. string.format("%3d", i) .. hl.Off() .. ". " .. hl.align(nonnull.value(it.name, '?'), 20) .. " " .. hl.Faint() .. nonnull.value(it.text, ''))
 
     lines = lines - 1
     if lines <= 0 then break end
@@ -210,23 +187,26 @@ end
 
 local function show_people_list(people)
   show_title"People"
-  show_items(nonnull.value(people, People))
+  show_items(nonnull.value(people, data.people))
 end
 
 local function show_task_list(tasks)
   show_title("Tasks")
-  show_items(nonnull.value(tasks, Tasks))
+  show_items(nonnull.value(tasks, data.tasks))
 end
 
 
 local function hlRedUnderlined(s) return hl.Red() .. hl.Underline() .. s .. hl.Off() end
 
-makeChord('?', function() set_current_screen(show_help) end, "Show chords help")
+make_chord('?', function() set_current_screen(show_help) end, "Show chords help")
 
-makeChord('l', function() set_current_screen(show_list) end, "List: " .. hlRedUnderlined('p') .. "eople, tasks,..", true)
-makeChord('lp', function() set_current_screen(show_people_list) end, "List people")
-makeChord('lt', function() set_current_screen(show_task_list) end, "List tasks")
+make_chord('l', function() set_current_screen(show_list) end, "List: " .. hlRedUnderlined('p') .. "eople, tasks,..", true)
+make_chord('lp', function() set_current_screen(show_people_list) end, "List people")
+make_chord('lt', function() set_current_screen(show_task_list) end, "List tasks")
 
+make_chord('S', save_data, 'Save data')
+
+-- ------------------------------------------------------------------------------------------------------------------------
 
 do
   local key = 0
@@ -235,6 +215,7 @@ do
 
   while chars ~= 'q' do
 
+    display.show_border = show_border
     display.show_header = show_header
     display.show_status = show_status
 
@@ -248,7 +229,7 @@ do
 
    
 
-    print(hl.Locate(10, 40)() .. key .. " => [" .. current_chord .. "] " .. genid())
+    print(hl.Locate(10, 40)() .. key .. " => [" .. current_chord .. "] ")
 
     if chord ~= nil then
       local func = chord.func

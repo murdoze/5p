@@ -207,6 +207,54 @@ hl.printColorTable = function()
 	end
 end
 
+-- https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
+hl.Border = function(t, l, h, w)
+-- print'\27(0 q x l m k j    \27(B'
+-- ─ │ ┌ └ ┐ ┘    
+  local s = ''
+
+  s = s .. hl.Locate(t, l)()
+  s = s .. '\27(0' 
+
+  s = s .. 'l'
+  s = s .. string.rep('q', w - 2)
+  s = s .. 'k'
+
+  s = s .. '\27(B' 
+
+  for i = t + 1, t + h - 2 do
+    s = s .. hl.Locate(i, l)()
+    s = s .. '\27(0' 
+    s = s .. 'x'
+    s = s .. '\27(B' 
+
+    s = s .. hl.Locate(i, l + w - 1)()
+    s = s .. '\27(0' 
+    s = s .. 'x'
+    s = s .. '\27(B' 
+  end
+
+
+  s = s .. hl.Locate(t + h - 1, l)()
+  s = s .. '\27(0' 
+
+  s = s .. 'm'
+  s = s .. string.rep('q', w - 2)
+  s = s .. 'j'
+
+  s = s .. '\27(B' 
+
+  return s
+end
+
+hl.SaveScreen = function()
+  return csi('h', '?1049')
+end
+
+hl.RestoreScreen = function()
+  return csi('l', '?1049')
+end
+
 -- Length of the visible string not counting control character
 -- If limit is specified, the length of the substring of needed length if returned
 hl.strlen = function(s, limit)
