@@ -207,14 +207,16 @@ hl.printColorTable = function()
 	end
 end
 
--- Length of teh string not counting control character
-hl.strlen = function(s)
+-- Length of the visible string not counting control character
+-- If limit is specified, the length of the substring of needed length if returned
+hl.strlen = function(s, limit)
   -- Skipping sequences of type
   -- \27[(c*)T
   -- where c is non-aphlabetic and T is any alphabetic terminator
   local len = 0
   local skipping = false
-  for i = 1, string.len(s) do
+  local strlen = string.len(s)
+  for i = 1, strlen do
     local c = string.sub(s, i, i)
     local b = string.byte(c)
     if skipping then
@@ -226,11 +228,20 @@ hl.strlen = function(s)
         skipping = true
       else
         len = len + 1
+	if limit ~= nil then
+	  if len >= limit then
+	    return i
+	  end
+        end
       end
     end
   end
 
-  return len
+  if limit ~= nil then
+    return strlen
+  else
+    return len
+  end
 end
 
 hl.pad = function(s, width, char)
@@ -244,11 +255,17 @@ hl.pad = function(s, width, char)
 end
 
 hl.cut = function(s, width)
-  if hl.strlen(s) > width then
-    return string.sub(s, 1, width)
+  local cutpoint = hl.strlen(s, width)
+
+  if cutpoint > width then
+    return string.sub(s, 1, cutpoint)
   else
     return s
   end
+end
+
+hl.align = function(s, width)
+  return hl.pad(hl.cut(s, width), width)
 end
 
 return hl
