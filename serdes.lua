@@ -18,17 +18,29 @@ local function dir_save(dir, filename, o)
 end
 
 local function load_file(file)
-    local f = assert(io.open(file, "r"))
-    local content = f:read("*a")
-    f:close()
-    return content
+  local f, err = io.open(file, "r")
+
+  if f == nil then
+    return false, err
+  end
+
+  local content = f:read("*a")
+  f:close()
+
+  return true, content
 end
 
 local function save_file(file, content)
-    local f = assert(io.open(file, "w+"))
-    local content = f:write(content)
-    f:close()
-    return content
+  local f, err = io.open(file, "w+")
+
+  if f == nil then
+    return false, err
+  end
+
+  local content = f:write(content)
+  f:close()
+
+  return true
 end
 
 local function dir_save_people(dir, people)
@@ -55,10 +67,18 @@ end
 local function save_dir(dir, data)
   -- Unfixup references
 
-  save_file(dir .. people_filename, data.people)
+  local res, err
+
+  res, err = save_file(dir .. people_filename, data.people)
+  if not res then
+    return res, err
+  end
+
   save_file(dir .. tasks_filename, data.tasks)
 
   -- Fixup references back
+
+  return true
 end
 
 
