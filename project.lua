@@ -131,7 +131,7 @@ end
 local function show_ruler()
   local r10 = "" 
   local r01 = ""
-  for i = 0, 99 do
+  for i = 0, 179 do
     if i % 10 == 0 then r10 = r10 .. string.char(i / 10 + string.byte('0')) else r10 = r10 .. " " end
     r01 = r01 .. string.char(i % 10 + string.byte('0'))
   end
@@ -153,7 +153,7 @@ end
 local function show_header()
   show_ruler()
   display.print(hl.Locate(display.header_line, 1)())
-  display.print_line(hl.White() .. hl.BgRed() .. "5p — Personal Portable Project Planning Paradise")
+  display.print_line(hl.White() .. hl.BgRed() .. "5p: Personal Portable Project Planning Paradise")
 end
 
 local function show_line_numbers()
@@ -193,8 +193,7 @@ local function show_people_list(people)
 end
 
 local function show_task_list(tasks)
-  show_title("AAAAAAA")
-  show_title("AAAAAAA")
+  show_title("Tasks")
   show_items(nonnull.value(tasks, Tasks))
 end
 
@@ -239,9 +238,6 @@ do
     end  
 
   end
-
-  hl.printColorTable()
-
 end
 
 
