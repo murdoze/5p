@@ -38,7 +38,8 @@ p =
   id = genid(),
   item = Item.Person,
   name = 'RP',
-  text = 'Roman Pavlyuk, CTO, характєр мєрзкій, нє женат'
+  -- text = 'Roman Pavlyuk, CTO, характєр мєрзкій, нє женат'
+  text = 'Roman Pavlyuk, CTO, a very inteligent and self-loving human being, a dream of every woman'
 }
 table.insert(People, p)
 
@@ -47,7 +48,7 @@ p =
   id = genid(),
   item = Item.Person,
   name = 'AL',
-  text = 'Anton Lutsyshyn, фізик-самогонщик, характєр мєрзкій, нє женат'
+  text = 'Anton Lutsyshyn, let the moon shine and let the circuits blow!'
 }
 table.insert(People, p)
 
@@ -62,6 +63,17 @@ t =
   assigned_to = p,
 }
 table.insert(Tasks, t)
+
+  for i=1,10000 do
+  t =
+  {
+    id = genid(),
+    item = Item.Task,
+    text = 'Task #' .. tostring(i+1) .. ": this is a very important task, a very long line, and overall life is suffering and we all shall eventually die",
+    assigned_to = p,
+  }
+  table.insert(Tasks, t)
+end
 
 
 -- local t_ser = serpent.dump(t)
@@ -181,9 +193,18 @@ end
 local function show_items(items)
   items = nonnull.list(items)
 
+  local lines = display.list_end_line - display.list_begin_line + 1
+
+  display.locate(display.list_begin_line)
+  display.print_line(hl.Yellow() .. "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789")
+
   for i, it in ipairs(items) do
-    display.locate(display.list_begin_line + i - 1)
-    display.print(i .. ". " .. nonnull.value(it.name, '?UNKNOWN?') .. "\t\t" .. hl.Faint() .. nonnull.value(it.text, '') .. hl.Off() .. "\n")
+    display.locate(display.list_begin_line + i - 1 + 1)
+    display.print_line(hl.Yellow() .. string.format("%3d", i) .. hl.Off() .. ". " .. hl.align(nonnull.value(it.name, '?UNKNOWN?'), 20) .. " " .. hl.Faint() .. nonnull.value(it.text, ''))
+    --display.print_line(hl.Yellow() .. string.format("%3d", i) .. hl.Off() .. ". " .. nonnull.value(it.name, '?UNKNOWN?') .. " " .. hl.Faint() .. nonnull.value(it.text, ''))
+
+    lines = lines - 1
+    if lines <= 0 then break end
   end
 end
 
