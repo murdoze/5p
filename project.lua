@@ -85,6 +85,10 @@ local function set_current_screen(func)
 end
 
 local function show_border()
+  display.print(hl.Border(1, 1, display.height, display.width))
+end
+
+local function show_borderi_old()
 -- print'\27(0 q x l m k j    \27(B'
 -- ─ │ ┌ └ ┐ ┘    
 
@@ -107,7 +111,6 @@ local function show_border()
     display.print'\27(0' 
     display.print'x'
     display.print'\27(B' 
-
   end
 
 
@@ -164,6 +167,10 @@ end
 
 local function show_help()
   show_title('HELP !!!!!!!')
+
+  local b = hl.Border(10, 10, 5, 20)
+
+  print(b)
 end
 
 local function show_list()
@@ -213,6 +220,8 @@ do
   local chars = ''
   local chord = nil
 
+  print(hl.SaveScreen()())
+
   while chars ~= 'q' do
 
     display.show_border = show_border
@@ -222,14 +231,14 @@ do
     display.draw()
  
     key = inkey()
-    print(hl.Cls())
+    -- print(hl.Cls())
  
     chars = charsFor(key)
     chord = chordFor(key)
 
    
 
-    print(hl.Locate(10, 40)() .. key .. " => [" .. current_chord .. "] ")
+    -- print(hl.Locate(10, 40)() .. key .. " => [" .. current_chord .. "] ")
 
     if chord ~= nil then
       local func = chord.func
@@ -240,6 +249,8 @@ do
     end  
 
   end
+
+  print(hl.RestoreScreen()())
 end
 
 
