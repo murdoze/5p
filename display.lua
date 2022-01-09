@@ -30,7 +30,7 @@ display.print = function(s)
 end
 
 display.print_line = function(s)
-  io.write(hl.pad(hl.cut(s, display.width), display.width) .. "|" .. hl.Off())
+  io.write(hl.align(s, display.width) .. "|" .. hl.Off())
 end
 
 display.show_header = function() end
