@@ -30,11 +30,12 @@ display.print = function(s)
 end
 
 display.print_line = function(s)
-  io.write(string.pad(string.cut(s, display.width), display.width) .. "|" .. hl.Off())
+  io.write(hl.pad(hl.cut(s, display.width), display.width) .. "|" .. hl.Off())
 end
 
 display.show_header = function() end
 display.show_status = function() end
+display.show_keys = function() end
 
 display.current_screen = function() end
 
@@ -46,6 +47,7 @@ display.draw = function()
   display.show_header()
   display.current_screen()
   display.show_status()
+  display.show_keys()
   io.flush()
 end
 
