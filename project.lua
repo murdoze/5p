@@ -11,6 +11,10 @@ local serdes = require'serdes'
 
 require'noglobals'
 
+-- Status
+
+local status_text = 'Status normal'
+
 -- Project
 
 local project = {}
@@ -18,12 +22,10 @@ local project = {}
 project.dir = "./examples/project1/"
 
 local function save_data()
-  display.locate(10, 10)
-  display.print_line(hl.Red() .. "Saving to " .. project.dir .. hl.Off())
-  serdes.save_dir(project.dir, data)
-  display.locate(11, 10)
-  display.print_line(hl.Red() .. "Saved to " .. project.dir .. hl.Off())
-  inkey()
+  local res, err = serdes.save_dir(project.dir, data)
+  if not res then
+    status_text = hl.White() .. hl.BgRed() .. err
+  end
 end
 
 -- Chord processing
@@ -161,7 +163,7 @@ end
 
 local function show_status()
   display.locate(display.status_line)
-  display.print_line(hl.White() .. hl.BgBlue() .. " Status normal")
+  display.print_line(hl.White() .. hl.BgBlue() .. status_text)
 end
 
 
@@ -220,7 +222,7 @@ do
   local chars = ''
   local chord = nil
 
-  print(hl.SaveScreen()())
+  display.print(hl.SaveScreen()())
 
   while chars ~= 'q' do
 
@@ -250,7 +252,7 @@ do
 
   end
 
-  print(hl.RestoreScreen()())
+  display.print(hl.RestoreScreen()())
 end
 
 
