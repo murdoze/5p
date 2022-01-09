@@ -209,6 +209,46 @@ end
 
 -- Length of teh string not counting control character
 hl.strlen = function(s)
+  -- Skipping sequences of type
+  -- \27[(c*)T
+  -- where c is non-aphlabetic and T is any alphabetic terminator
+  local len = 0
+  local skipping = false
+  for i = 1, string.len(s) do
+    local c = string.sub(s, i, i)
+    local b = string.byte(c)
+    if skipping then
+      if (b >= string.byte('A') and b <= string.byte('Z')) or (b >= string.byte('a') and b <= string.byte('z')) then
+        skipping = false  
+      end
+    else
+      if b == 27 then
+        skipping = true
+      else
+        len = len + 1
+      end
+    end
+  end
+
+  return len
+end
+
+hl.pad = function(s, width, char)
+  local pad = width - hl.strlen(s)
+  if pad > 0 then
+    if char == nil then char = ' ' end
+    return s .. string.rep(char, pad)
+  else
+    return s
+  end
+end
+
+hl.cut = function(s, width)
+  if hl.strlen(s) > width then
+    return string.sub(s, 1, width)
+  else
+    return s
+  end
 end
 
 return hl
