@@ -21,6 +21,17 @@ local project = {}
 
 project.dir = "./examples/project1/"
 
+local function load_data()
+  local res, new_data = serdes.load_dir(project.dir)
+  if not res then
+    status_text = hl.White() .. hl.BgRed() .. new_data
+    return
+  end
+
+  data.people = new_data.people
+  data.tasks = new_data.tasks
+end
+
 local function save_data()
   local res, err = serdes.save_dir(project.dir, data)
   if not res then
@@ -29,6 +40,12 @@ local function save_data()
 end
 
 -- Chord processing
+
+local function CTRL_(c)
+  local b = string.byte(c) - string.byte'A' + 1
+
+  return string.char(b)
+end
 
 local current_chord = ''
 
@@ -88,42 +105,6 @@ end
 
 local function show_border()
   display.print(hl.Border(1, 1, display.height, display.width))
-end
-
-local function show_borderi_old()
--- print'\27(0 q x l m k j    \27(B'
--- ─ │ ┌ └ ┐ ┘    
-
-  display.locate(1, 1)
-  display.print'\27(0' 
-
-  display.print'l'
-  display.print(string.rep('q', display.width-2))
-  display.print'k'
-
-  display.print'\27(B' 
-
-  for i = 2, display.height - 1 do
-    display.locate(i, 1)
-    display.print'\27(0' 
-    display.print'x'
-    display.print'\27(B' 
-
-    display.locate(i, display.width)
-    display.print'\27(0' 
-    display.print'x'
-    display.print'\27(B' 
-  end
-
-
-  display.locate(display.height, 1)
-  display.print'\27(0' 
-
-  display.print'm'
-  display.print(string.rep('q', display.width-2))
-  display.print'j'
-
-  display.print'\27(B' 
 end
 
 local function show_ruler()
@@ -213,7 +194,10 @@ make_chord('l', function() set_current_screen(show_list) end, "List: " .. hlRedU
 make_chord('lp', function() set_current_screen(show_people_list) end, "List people")
 make_chord('lt', function() set_current_screen(show_task_list) end, "List tasks")
 
-make_chord('S', save_data, 'Save data')
+make_chord(CTRL_'Q', function() display.print(hl.RestoreScreen()()); os.exit(0) end, 'Quit')
+
+make_chord(CTRL_'S', save_data, 'Save data')
+make_chord(CTRL_'O', load_data, 'Load data')
 
 -- ------------------------------------------------------------------------------------------------------------------------
 
