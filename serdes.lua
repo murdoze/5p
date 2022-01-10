@@ -6,6 +6,8 @@
 -- ./Tasks.lua
 -- ..
 
+local serpent = require'serpent'
+
 local serdes = {}
 
 serdes.dir = {}
@@ -24,36 +26,39 @@ local function load_file(file)
     return false, err
   end
 
-  local content = f:read("*a")
+  local s = f:read("*a")
   f:close()
 
-  return true, content
+  local res, o = serpent.load(s)
+  if not res then return res, o end
+
+  return true, o
 end
 
-local function save_file(file, content)
+local function save_file(file, o)
   local f, err = io.open(file, "w+")
 
   if f == nil then
     return false, err
   end
 
-  local content = f:write(content)
+  local s = serpent.block(o, { comment = false, sparse = true })
+
+  local content = f:write(s)
   f:close()
 
   return true
 end
 
-local function dir_save_people(dir, people)
-  
-end
-
-local function dir_load_people(filename)
-end
-
-
 local function load_dir(dir)
-  local people = load_file(dir .. people_filename)
-  local tasks = load_file(dir .. tasks_filename)
+  local res = true
+  local people, tasks 
+
+  res, people = load_file(dir .. people_filename)
+  if not res then return res, people end
+
+  res, tasks = load_file(dir .. tasks_filename)
+  if not res then return res, tasks end
 
   local data = {}
   data.people = people
@@ -61,7 +66,7 @@ local function load_dir(dir)
 
   -- Fixup references
 
-  return data
+  return true, data
 end
 
 local function save_dir(dir, data)
@@ -74,7 +79,10 @@ local function save_dir(dir, data)
     return res, err
   end
 
-  save_file(dir .. tasks_filename, data.tasks)
+  res, err = save_file(dir .. tasks_filename, data.tasks)
+  if not res then
+    return res, err
+  end
 
   -- Fixup references back
 
