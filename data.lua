@@ -58,7 +58,7 @@ t =
 }
 table.insert(tasks, t)
 
-  for i=1,10000 do
+for i=1,10000 do
   t =
   {
     id = genid(),
