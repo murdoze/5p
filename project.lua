@@ -58,6 +58,12 @@ end
 local function charsFor(key)
   local keymap =
   {
+    [262] = '_HOME_',
+    [360] = '_END_',
+    [259] = '_UP_',
+    [258] = '_DOWN_',
+    [339] = '_PGUP_',
+    [338] = '_PGDOWN_',
   }
 
   local cmd = keymap[key]
@@ -162,16 +168,23 @@ local function show_list()
 end
 
 local function show_items(items)
+  display.view.items = items
   items = nonnull.list(items)
 
-  local lines = display.list_end_line - display.list_begin_line + 1
+  local lines = display.list_count
+
+  if display.view.start < 1 then display.view.start = 1 end
+  if display.view.start > #items then display.view.start = #items end
+
 
   for i, it in ipairs(items) do
-    display.locate(display.list_begin_line + i - 1)
-    display.print_line(hl.Yellow() .. string.format("%3d", i) .. hl.Off() .. ". " .. hl.align(nonnull.value(it.name, '?'), 20) .. " " .. hl.Faint() .. nonnull.value(it.text, ''))
+    if i >= display.view.start then
+      display.locate(display.list_begin_line + i - 1 - display.view.start)
+      display.print_line(hl.Yellow() .. string.format("%3d", i) .. hl.Off() .. ". " .. hl.align(nonnull.value(it.name, '?'), 20) .. " " .. hl.Faint() .. nonnull.value(it.text, ''))
 
-    lines = lines - 1
-    if lines <= 0 then break end
+      lines = lines - 1
+      if lines <= 0 then break end
+    end
   end
 end
 
@@ -199,6 +212,14 @@ make_chord(CTRL_'Q', function() display.print(hl.RestoreScreen()()); os.exit(0) 
 make_chord(CTRL_'S', save_data, 'Save data')
 make_chord(CTRL_'O', load_data, 'Load data')
 
+make_chord('_DOWN_', function() display.view.start = display.view.start + 1 end, 'Scroll up')
+make_chord('_UP_', function() display.view.start = display.view.start - 1 end, 'Scroll down')
+make_chord('_PGDOWN_', function() display.view.start = display.view.start + display.list_count end, 'Scroll up')
+make_chord('_PGUP_', function() display.view.start = display.view.start - display.list_count end, 'Scroll down')
+make_chord('_HOME_', function() display.view.start = 1 end, 'Scroll down')
+make_chord('_END_', function() display.view.start = #display.view.items end, 'Scroll down')
+
+
 -- ------------------------------------------------------------------------------------------------------------------------
 
 do
@@ -222,11 +243,13 @@ do
     chars = charsFor(key)
     chord = chordFor(key)
 
+
    
 
     -- print(hl.Locate(10, 40)() .. key .. " => [" .. current_chord .. "] ")
 
     if chord ~= nil then
+      status_text = "Chord: .. [" ..current_chord .. "] key: [" .. key .. "]"
       local func = chord.func
       if func ~= nil then
         func()

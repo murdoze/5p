@@ -3,16 +3,22 @@
 local hl = require'highlight'
 
 local display = {}
+local view = {}
+
+view.start = 1
+view.items = {}
+
+display.view = view
 
 display.width = 80
 display.height = 30
 
 display.header_line = 2
 display.title_line = display.header_line + 2
+display.list_count = 0
 display.status_line = -1
 
 display.list_begin_line = display.title_line + 3
-display.list_end_line = -1
 
 display.get_window_size = function()
   local tmp_lines=os.tmpname()
@@ -30,7 +36,7 @@ end
 
 display.handle_resize = function()
   display.status_line = display.height - 1
-  display.list_end_line = display.status_line - 2
+  display.list_count = display.status_line - display.list_begin_line - 1
 end
 
 --
