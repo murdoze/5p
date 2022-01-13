@@ -1,2 +1,2 @@
 all:
-	lua project.lua
+	luajit project.lua
