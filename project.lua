@@ -167,7 +167,9 @@ local function show_list()
   -- show_line_numbers()
 end
 
-local function show_items(items)
+local function show_items(title, items)
+  show_title(title)
+
   display.view.items = items
   items = nonnull.list(items)
 
@@ -188,14 +190,8 @@ local function show_items(items)
   end
 end
 
-local function show_people_list(people)
-  show_title"People"
-  show_items(nonnull.value(people, data.people))
-end
-
-local function show_task_list(tasks)
-  show_title("Tasks")
-  show_items(nonnull.value(tasks, data.tasks))
+local function show_tasks(tasks)
+  show_items("Tasks", nonnull.value(tasks, data.tasks))
 end
 
 
@@ -204,8 +200,12 @@ local function hlRedUnderlined(s) return hl.Red() .. hl.Underline() .. s .. hl.O
 make_chord('?', function() set_current_screen(show_help) end, "Show chords help")
 
 make_chord('l', function() set_current_screen(show_list) end, "List: " .. hlRedUnderlined('p') .. "eople, tasks,..", true)
-make_chord('lp', function() set_current_screen(show_people_list) end, "List people")
-make_chord('lt', function() set_current_screen(show_task_list) end, "List tasks")
+
+make_chord('lp', function() set_current_screen(function() show_items("People", data.people) end) end, "List people")
+make_chord('lt', function() set_current_screen(function() show_items("Tasks", data.tasks) end) end, "List tasks")
+make_chord('lc', function() set_current_screen(function() show_items("Customers", data.customers) end) end, "List customers")
+make_chord('lm', function() set_current_screen(function() show_items("Milestones", data.milestones) end) end, "List milestones")
+make_chord('ld', function() set_current_screen(function() show_items("Drones", data.drones) end) end, "List drones")
 
 make_chord(CTRL_'Q', function() display.print(hl.RestoreScreen()()); os.exit(0) end, 'Quit')
 

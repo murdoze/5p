@@ -14,6 +14,9 @@ serdes.dir = {}
 
 local people_filename = 'People.lua'
 local tasks_filename = 'Tasks.lua'
+local customers_filename = 'Customers.lua'
+local milestones_filename = 'Milestones.lua'
+local drones_filename = 'Drones.lua'
 
 local function dir_save(dir, filename, o)
   
@@ -52,7 +55,7 @@ end
 
 local function load_dir(dir)
   local res = true
-  local people, tasks 
+  local people, tasks, customers, milestones, drones
 
   res, people = load_file(dir .. people_filename)
   if not res then return res, people end
@@ -60,9 +63,21 @@ local function load_dir(dir)
   res, tasks = load_file(dir .. tasks_filename)
   if not res then return res, tasks end
 
+  res, customers = load_file(dir .. customers_filename)
+  if not res then return res, tasks end
+
+  res, milestones = load_file(dir .. milestones_filename)
+  if not res then return res, tasks end
+
+  res, drones = load_file(dir .. drones_filename)
+  if not res then return res, tasks end
+
   local data = {}
   data.people = people
   data.tasks = tasks
+  data.customers = customers
+  data.milestones = milestones
+  data.drones = drones
 
   -- Fixup references
 
@@ -75,14 +90,19 @@ local function save_dir(dir, data)
   local res, err
 
   res, err = save_file(dir .. people_filename, data.people)
-  if not res then
-    return res, err
-  end
+  if not res then return res, err end
 
   res, err = save_file(dir .. tasks_filename, data.tasks)
-  if not res then
-    return res, err
-  end
+  if not res then return res, err end
+
+  res, err = save_file(dir .. customers_filename, data.customers)
+  if not res then return res, err end
+
+  res, err = save_file(dir .. milestones_filename, data.milestones)
+  if not res then return res, err end
+
+  res, err = save_file(dir .. drones_filename, data.drones)
+  if not res then return res, err end
 
   -- Fixup references back
 

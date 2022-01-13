@@ -15,11 +15,17 @@ local Item =
 
 local people = {}
 local tasks = {}
+local customers = {}
+local milestones = {}
+local drones = {}
 
 data.Item = Item
+
 data.people = people
 data.tasks = tasks
-
+data.customers = customers
+data.milestones = milestones
+data.drones = drones
 
 -- Data Base
 
