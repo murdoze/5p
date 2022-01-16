@@ -38,7 +38,6 @@ p =
   id = genid(),
   item = Item.Person,
   name = 'RP',
-  -- text = 'Roman Pavlyuk, CTO, характєр мєрзкій, нє женат'
   text = 'Roman Pavlyuk, CTO, a very inteligent and self-loving human being, a dream of every woman'
 }
 table.insert(people, p)
