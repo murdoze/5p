@@ -44,9 +44,9 @@ local getch = function() return kb.getch() end
 
 local push = function(t, v) table.insert(t, v) end
 
-local ffi = require'ffi'
-ffi.cdef[[
-  /* libc definitions */
+--local ffi = require'ffi'
+--ffi.cdef[[
+--[[  /* libc definitions */
   void* malloc(size_t bytes);
   void free(void *);
   
@@ -62,12 +62,45 @@ ffi.cdef[[
   
   const char *rl_basic_word_break_characters;
   rl_completion_func_t *rl_attempted_completion_function;
+
   char *rl_line_buffer;
+  int rl_point;
+  int rl_end;
+  void rl_extend_line_buffer(int len);
+  int rl_insert_text (char *text);
+  int rl_initialize(void);
+  int rl_redisplay ();
+  int rl_forced_update_display ();
+
   int rl_completion_append_character;
   int rl_attempted_completion_over;
 ]]
+
+--[[
 local libreadline = ffi.load("readline")
+local rl_initialize = libreadline.rl_initialize
 local read = function() libreadline.readline("> ") end
+local rl_point = libreadline.rl_point
+local rl_end = libreadline.rl_end
+local rl_line_buffer = libreadline.rl_line_buffer
+local rl_extend_line_buffer = libreadline.rl_extend_line_buffer
+local rl_insert_text = libreadline.rl_insert_text
+local rl_redisplay = libreadline.rl_redisplay
+local rl_forced_update_display = libreadline.rl_forced_update_display
+
+print"QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ"
+print(rl_initialize())
+--local buf = ffi.C.malloc(100)
+--ffi.copy(buf, "0123456789", 10)
+--rl_line_buffer = buf
+print(rl_insert_text(ffi.cast("char *", "Qwertyuiop")))
+read("> ")
+print(rl_extend_line_buffer(100))
+print(rl_point, rl_end, rl_line_buffer)
+--print("RL: " .. ffi.string(rl_line_buffer) .. " === ")
+print"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+getch()
+]]
 
 register(
   pp, getch, push, read
