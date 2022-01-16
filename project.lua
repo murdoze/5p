@@ -6,6 +6,7 @@ local serpent = require'serpent'
 
 local display = require'display'
 
+local genid = require'genid'
 local data = require'data'
 local serdes = require'serdes'
 
@@ -332,6 +333,21 @@ local function edit_in_vim(s)
   return s
 end
 
+-- Item manipulation
+local yanked_item = {}
+
+local function copy_item(it)
+  local r = {}
+
+  r.id = nil
+  r.name = it.name
+  r.text = it.text
+  r.labels = it.labels
+  r.assigned_to = it.assigned_to
+
+  return r
+end
+
 local function get_current_item()
   local cursor = display.view.cursor
   if cursor == nil then return nil end
@@ -348,6 +364,48 @@ local function edit_current_item(field)
   end
 end
 
+local function delete_current_item()
+  local cursor = display.view.cursor
+  if cursor == nil then return nil end
+
+  local it = table.remove(display.view.items, cursor)
+
+  yanked_item = copy_item(it)
+
+  if #display.view.items < cursor then
+    display.view.cursor = #display.view.items
+  end
+end
+
+local function insert_item()
+  local cursor = display.view.cursor
+  if cursor == nil then return nil end
+
+  local it = {}
+  it.id = genid()
+  it.name = ''
+  it.text = ''
+
+  table.insert(display.view.items, cursor, it)
+end
+
+local function paste_item()
+  local cursor = display.view.cursor
+  if cursor == nil then return nil end
+
+  local it = {}
+  it.id = genid()
+  it.name = yanked_item.name
+  it.text = yanked_item.text
+  it.labels = yanked_item.labels
+  it.assigned_to = yanked_item.assigned_to
+
+  table.insert(display.view.items, cursor, it)
+end
+
+
+
+
 -- 
 
 local function quit()
@@ -355,34 +413,43 @@ local function quit()
   os.exit(0)
 end
 
+local function save_and_quit()
+  save_data()
+  quit()
+end
+
+local function quit_no_save()
+  quit()
+end
+
 -- Chords
 
 make_chord('?', function() set_current_screen(function() show_view(chords_view) end) end, "Show chords help")
 make_chord('<^H>', function() set_current_screen(function() show_items("Chords", chords) end) end, "Show chords help")
-
+make_chord('--------------------------------------------')
+make_chord('q', nil, "Quit", true)
+make_chord('qq', save_and_quit, "Save and quit")
+make_chord('q!', quit_no_save, "Quit without saving")
+make_chord('<^S>', save_data, "Save data")
+make_chord('<^O>', load_data, "Load data")
+make_chord('--------------------------------------------')
 make_chord('l', function() set_current_screen(function() show_view(chords_list_view) end) end, "List", true)
-
 make_chord('lp', function() set_current_screen(function() show_view(people_view) end) end, "List people")
 make_chord('lt', function() set_current_screen(function() show_view(tasks_view) end) end, "List tasks")
 make_chord('lc', function() set_current_screen(function() show_items("Customers", data.customers) end) end, "List customers")
 make_chord('lm', function() set_current_screen(function() show_items("Milestones", data.milestones) end) end, "List milestones")
 make_chord('ld', function() set_current_screen(function() show_items("Drones", data.drones) end) end, "List drones")
-
-make_chord('<^Q>', quit, 'Quit')
-make_chord('q', quit, 'Quit')
-
-make_chord('<^S>', save_data, 'Save data')
-make_chord('<^O>', load_data, 'Load data')
-
 make_chord('<DOWN>', function() scroll{ by = 1 } end, 'Scroll up')
 make_chord('<UP>', function() scroll{ by = -1 } end, 'Scroll down')
 make_chord('<PGDOWN>', function() scroll{ by = display.list_count } end, 'Scroll page up')
 make_chord('<PGUP>', function() scroll{ by = -display.list_count } end, 'Scroll page down')
 make_chord('<HOME>', function() scroll{ to = 1 } end, 'First item')
 make_chord('<END>', function() scroll{ to = #display.view.items } end, 'Last item')
-
-make_chord('i', function() local s = read() end, 'Read')
-
+make_chord('--------------------------------------------')
+make_chord('i', function() insert_item() end, 'Insert item above')
+make_chord('d', function() delete_current_item() end, 'Delete current item')
+make_chord('p', function() paste_item() end, 'Paste item')
+make_chord('--------------------------------------------')
 make_chord('e', function() end, 'Edit', true)
 make_chord('ea', function() edit_all_in_vim() end, 'Edit all in Vim')
 make_chord('en', function() edit_current_item'name' end, 'Edit name in Vim')
