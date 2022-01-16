@@ -47,13 +47,16 @@ end
 
 -- Chord processing
 
-local function CTRL_(c)
-  local b = string.byte(c) - string.byte'A' + 1
+local input = {}
 
-  return string.char(b)
-end
+input.in_search = false
+input.search_str = ''
+
+input.number = 0
+input.last_number = 0
 
 local current_chord = ''
+local last_chord = ''
 
 local chords = {}
 
@@ -65,8 +68,25 @@ local function make_chord(chord, func, text, continue_chord)
 end
 
 local function chars_for(key)
+  if input.in_search then
+    if key ~= 10 then
+      if key == 27 then
+        input.in_search = false
+      else
+        input.search_str = input.search_str .. string.char(key)
+      end  
+      return ''
+    end  
+  end
+
+  if key >= string.byte('0') and key <= string.byte('9') then
+    input.number = input.number * 10 + (key - string.byte('0'))
+    return ''
+  end
+
   local keymap =
   {
+    [10] = '<CR>',
     [262] = '<HOME>',
     [360] = '<END>',
     [259] = '<UP>',
@@ -91,6 +111,9 @@ end
 
 local function chord_for(key)
   local chars = chars_for(key)
+  if chars == '' then return nil end
+
+
   current_chord = current_chord .. chars
 
   local chord = chords[current_chord]
@@ -98,14 +121,18 @@ local function chord_for(key)
   if chord ~= nil then
     -- play the chord
 
+    last_chord = current_chord
+
     if chord.continue then
     else
       current_chord = ''
     end
+    input.last_number = input.number
 
     return chord
   else
     -- start over
+    last_chord = current_chord
     current_chord = ''
 
     return nil
@@ -147,7 +174,7 @@ end
 local function show_header()
   show_ruler()
   display.locate(display.header_line - 1)
-  display.print(" 5p: Personal Portable Project Planning Paradise ")
+  display.print(" 5p: Personal Portable Project Planning Pentagram or Personal Jira ")
 end
 
 local function show_line_numbers()
@@ -377,7 +404,7 @@ local function delete_current_item()
   end
 end
 
-local function insert_item()
+local function insert_item(offset)
   local cursor = display.view.cursor
   if cursor == nil then return nil end
 
@@ -386,7 +413,7 @@ local function insert_item()
   it.name = ''
   it.text = ''
 
-  table.insert(display.view.items, cursor, it)
+  table.insert(display.view.items, cursor + offset, it)
 end
 
 local function paste_item()
@@ -402,9 +429,6 @@ local function paste_item()
 
   table.insert(display.view.items, cursor, it)
 end
-
-
-
 
 -- 
 
@@ -446,7 +470,8 @@ make_chord('<PGUP>', function() scroll{ by = -display.list_count } end, 'Scroll 
 make_chord('<HOME>', function() scroll{ to = 1 } end, 'First item')
 make_chord('<END>', function() scroll{ to = #display.view.items } end, 'Last item')
 make_chord('--------------------------------------------')
-make_chord('i', function() insert_item() end, 'Insert item above')
+make_chord('i', function() insert_item(0) end, 'Insert item above')
+make_chord('A', function() insert_item(1) end, 'Insert item below')
 make_chord('d', function() delete_current_item() end, 'Delete current item')
 make_chord('p', function() paste_item() end, 'Paste item')
 make_chord('--------------------------------------------')
@@ -454,6 +479,10 @@ make_chord('e', function() end, 'Edit', true)
 make_chord('ea', function() edit_all_in_vim() end, 'Edit all in Vim')
 make_chord('en', function() edit_current_item'name' end, 'Edit name in Vim')
 make_chord('et', function() edit_current_item'text' end, 'Edit text in Vim')
+make_chord('--------------------------------------------')
+make_chord('/', function() input.in_search = true; input.search_str = '' end, 'Search')
+make_chord('<CR>', function() input.in_search = false; print(input.search_str); inkey() end, 'Do search!')
+make_chord('g', function() if input.last_number ~= 0 then current_chord = ''; scroll{ to = input.last_number }; input.number = 0; input.last_number = 0; end end, 'Go to...', true)
 
 -- ------------------------------------------------------------------------------------------------------------------------
 
@@ -475,11 +504,8 @@ do
  
     key = inkey()
 
-
-    local last_chord = current_chord
-    local chars = chars_for(key)
     chord = chord_for(key)
-    status_text = "Chord: .. [" .. last_chord .. chars .. "] key: [" .. key .. "]"
+
 
     if chord ~= nil then
       local func = chord.func
@@ -487,6 +513,10 @@ do
         func()
       end
     end  
+
+    status_text = "Chord .. [" .. last_chord .. "] Key [" .. tostring(key) .. "]"
+    if input.number ~= 0 then status_text = status_text .. " Number [" .. tostring(input.number) .. "]" end
+    if input.in_search then status_text = status_text .. " Search [" .. input.search_str .. "]" end
 
   end
 end
