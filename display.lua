@@ -72,9 +72,10 @@ display.draw = function()
 
   display.show_border()
   display.show_header()
-  display.current_screen()
   display.show_status()
   display.show_keys()
+
+  display.current_screen()
   io.flush()
 end
 
