@@ -255,6 +255,10 @@ hl.RestoreScreen = function()
   return csi('l', '?1049')
 end
 
+hl.Reset = function()
+  return csi('p', '!')
+end
+
 -- Length of the visible string not counting control character
 -- If limit is specified, the length of the substring of needed length if returned
 hl.strlen = function(s, limit)
