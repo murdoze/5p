@@ -309,6 +309,45 @@ local function edit_all_in_vim()
   load_data()
 end
 
+local function edit_in_vim(s)
+  local tempfile = os.tmpname()  
+
+  local f = io.open(tempfile, 'w+')
+  if f ~= nil then
+    f:write(s)
+    f:close()
+  end
+
+  os.execute('vim ' .. tempfile)
+
+  local f = io.open(tempfile, "r")
+
+  if f ~= nil then
+    s = f:read("*l")
+    f:close()
+  end
+
+  os.remove(tempfile)
+
+  return s
+end
+
+local function get_current_item()
+  local cursor = display.view.cursor
+  if cursor == nil then return nil end
+  
+  local it = display.view.items[cursor]
+
+  return it
+end
+
+local function edit_current_item(field)
+  local it = get_current_item()
+  if it ~= nil then
+    it[field] = edit_in_vim(nonnull.value(it[field], '')) 
+  end
+end
+
 -- 
 
 local function quit()
@@ -346,12 +385,16 @@ make_chord('i', function() local s = read() end, 'Read')
 
 make_chord('e', function() end, 'Edit', true)
 make_chord('ea', function() edit_all_in_vim() end, 'Edit all in Vim')
+make_chord('en', function() edit_current_item'name' end, 'Edit name in Vim')
+make_chord('et', function() edit_current_item'text' end, 'Edit text in Vim')
 
 -- ------------------------------------------------------------------------------------------------------------------------
 
 do
   local key = 0
   local chord = nil
+
+  load_data()
 
   print(hl.SaveScreen()())
 
