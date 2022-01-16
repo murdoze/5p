@@ -27,12 +27,14 @@ local function load_data()
     status_text = hl.White() .. hl.BgRed() .. new_data
     return
   end
+ 
+  data.people = nonnull.value(new_data.people, data.people)
+  data.tasks = nonnull.value(new_data.tasks, data.tasks)
+  data.customers = nonnull.value(new_data.customers, data.customers)
+  data.milestones = nonnull.value(new_data.milestones, data.milestones)
+  data.drones = nonnull.value(new_data.drones, data.drones)
 
-  data.people = new_data.people
-  data.tasks = new_data.tasks
-  data.customers = new_data.customers
-  data.milestones = new_data.milestones
-  data.drones = new_data.drones
+  status_text = "Loaded project data from " .. project.dir
 end
 
 local function save_data()
@@ -161,6 +163,7 @@ end
 
 local function show_items(title, items)
   show_title(title)
+  display.print("(" .. tostring(#items) .. ")")
 
   display.view.items = items
   items = nonnull.list(items)
@@ -195,6 +198,10 @@ local function show_items(title, items)
 end
 
 local function show_view(view)
+  if view.update ~= nil then
+    view:update()
+  end
+
   display.view = view
 
   show_items(view.title, view.items)
@@ -246,20 +253,42 @@ local function scroll_up()
   scroll_by(1)
 end
 
+-- Table filter
+
+local function filter(t, func)
+  local r = {}
+
+  for i, it in ipairs(t) do
+    if func(it) then
+      table.insert(r, it)
+    end
+  end
+
+  return r
+end
+
 -- Views
 
 local chords_view =
 {
   title = " Chords ",
-  items = chords
+  items = chords,
+  update = function(self) self.items = filter(chords, function(it) return true end) end 
+}
+
+local chords_list_view = 
+{
+  title = " List: ",
+  update = function(self) self.items = filter(chords, function(it) return string.sub(it.name, 1, 1) == 'l' end) end 
 }
 
 local people_view = 
 {
   title = ' People ',
-  items = data.people,
+  items = {},
   start = 1,
   cursor = 1,
+  update = function(self) self.items = data.people end
 }
 
 local tasks_view = 
@@ -268,6 +297,7 @@ local tasks_view =
   items = data.tasks,
   start = 1,
   cursor = 1,
+  update = function(self) self.items = data.tasks end
 }
 
 
@@ -283,8 +313,6 @@ end
 
 local function quit()
   print(hl.RestoreScreen()())
-  print(hl.RestoreScreen()())
-  print(hl.RestoreScreen()())
   os.exit(0)
 end
 
@@ -293,7 +321,7 @@ end
 make_chord('?', function() set_current_screen(function() show_view(chords_view) end) end, "Show chords help")
 make_chord('<^H>', function() set_current_screen(function() show_items("Chords", chords) end) end, "Show chords help")
 
-make_chord('l', function() end, "List", true)
+make_chord('l', function() set_current_screen(function() show_view(chords_list_view) end) end, "List", true)
 
 make_chord('lp', function() set_current_screen(function() show_view(people_view) end) end, "List people")
 make_chord('lt', function() set_current_screen(function() show_view(tasks_view) end) end, "List tasks")
@@ -326,8 +354,6 @@ do
   local chord = nil
 
   print(hl.SaveScreen()())
-  print(hl.SaveScreen()())
-  print(hl.Reset()())
 
   while true do
 
@@ -338,12 +364,14 @@ do
     display.draw()
  
     key = inkey()
- 
-    chord = chord_for(key)
 
+
+    local last_chord = current_chord
+    local chars = chars_for(key)
+    chord = chord_for(key)
+    status_text = "Chord: .. [" .. last_chord .. chars .. "] key: [" .. key .. "]"
 
     if chord ~= nil then
-      status_text = "Chord: .. [" ..current_chord .. "] key: [" .. key .. "]"
       local func = chord.func
       if func ~= nil then
         func()
@@ -351,8 +379,6 @@ do
     end  
 
   end
-
-  --display.print(hl.RestoreScreen()())
 end
 
 
