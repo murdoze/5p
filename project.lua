@@ -1,4 +1,4 @@
-local pp, inkey, push = unpack(require 'lib/all')
+local pp, inkey, push, read = unpack(require 'lib/all')
 
 local hl = require'highlight'
 local nonnull = require'nonnull'
@@ -30,6 +30,9 @@ local function load_data()
 
   data.people = new_data.people
   data.tasks = new_data.tasks
+  data.customers = new_data.customers
+  data.milestones = new_data.milestones
+  data.drones = new_data.drones
 end
 
 local function save_data()
@@ -52,23 +55,28 @@ local current_chord = ''
 local chords = {}
 
 local function make_chord(chord, func, text, continue_chord)
-  chords[chord] = { func =  func, text = text, continue = continue_chord }
+  local ch = { func =  func, name = chord, text = text, continue = continue_chord }
+
+  table.insert(chords, ch)
+  chords[chord] = ch
 end
 
-local function charsFor(key)
+local function chars_for(key)
   local keymap =
   {
-    [262] = '_HOME_',
-    [360] = '_END_',
-    [259] = '_UP_',
-    [258] = '_DOWN_',
-    [339] = '_PGUP_',
-    [338] = '_PGDOWN_',
+    [262] = '<HOME>',
+    [360] = '<END>',
+    [259] = '<UP>',
+    [258] = '<DOWN>',
+    [339] = '<PGUP>',
+    [338] = '<PGDOWN>',
   }
 
   local cmd = keymap[key]
   if cmd == nil then
-    if key >= 0 and key <= 255 then
+    if key >= 0 and key < 32 then
+      cmd = '<^' .. string.char(string.byte('@') + key) .. '>'
+    elseif key >= 32 and key <= 255 then
       cmd = string.char(key)
     else
       cmd = ''
@@ -78,11 +86,9 @@ local function charsFor(key)
   return cmd
 end
 
-local function chordFor(key)
-  local chars = charsFor(key)
+local function chord_for(key)
+  local chars = chars_for(key)
   current_chord = current_chord .. chars
-
-  -- print("==>" .. current_chord .. "<==")
 
   local chord = chords[current_chord]
 
@@ -137,8 +143,8 @@ end
 
 local function show_header()
   show_ruler()
-  display.locate(display.header_line)
-  display.print_line(hl.White() .. hl.BgRed() .. "5p: Personal Portable Project Planning Paradise")
+  display.locate(display.header_line - 1)
+  display.print(" 5p: Personal Portable Project Planning Paradise ")
 end
 
 local function show_line_numbers()
@@ -153,25 +159,12 @@ local function show_status()
   display.print_line(hl.White() .. hl.BgBlue() .. status_text)
 end
 
-
-local function show_help()
-  show_title('HELP !!!!!!!')
-
-  local b = hl.Border(10, 10, 5, 20)
-
-  print(b)
-end
-
-local function show_list()
-  show_title"LIST!!!!"
-  -- show_line_numbers()
-end
-
 local function show_items(title, items)
   show_title(title)
 
   display.view.items = items
   items = nonnull.list(items)
+  display.view.start = nonnull.value(display.view.start, 1)
 
   local lines = display.list_count
 
@@ -179,57 +172,164 @@ local function show_items(title, items)
   if display.view.start > #items then display.view.start = #items end
 
 
+  local cursor_line = -1
   for i, it in ipairs(items) do
     if i >= display.view.start then
-      display.locate(display.list_begin_line + i - 1 - display.view.start)
-      display.print_line(hl.Yellow() .. string.format("%3d", i) .. hl.Off() .. ". " .. hl.align(nonnull.value(it.name, '?'), 20) .. " " .. hl.Faint() .. nonnull.value(it.text, ''))
+      local current_line = display.list_begin_line + i - 1 - display.view.start
+      display.locate(current_line)
+      local cursor = " "
+      if i == display.view.cursor then
+        cursor = hl.Green() .. hl.Bold() .. ">" .. hl.Off()
+	cursor_line = current_line
+      end
+      display.print_line(" " .. cursor .. " " .. hl.Yellow() .. string.format("%6d", i) .. hl.Off() .. ". " .. hl.align(nonnull.value(it.name, '?'), 20) .. " " .. hl.Faint() .. nonnull.value(it.text, ''))
 
       lines = lines - 1
       if lines <= 0 then break end
     end
   end
+
+  if cursor_line ~= -1 then
+    display.locate(cursor_line, 3)
+  end
 end
 
-local function show_tasks(tasks)
-  show_items("Tasks", nonnull.value(tasks, data.tasks))
+local function show_view(view)
+  display.view = view
+
+  show_items(view.title, view.items)
 end
 
+--
 
-local function hlRedUnderlined(s) return hl.Red() .. hl.Underline() .. s .. hl.Off() end
+local function scroll(args)
+  local by = args.by
+  local to = args.to
+  local view = display.view
 
-make_chord('?', function() set_current_screen(show_help) end, "Show chords help")
+  if view.cursor ~= nil then
 
-make_chord('l', function() set_current_screen(show_list) end, "List: " .. hlRedUnderlined('p') .. "eople, tasks,..", true)
+    if to ~= nil then
+      view.cursor = to 
+    else
+      view.cursor = view.cursor + by
+    end
 
-make_chord('lp', function() set_current_screen(function() show_items("People", data.people) end) end, "List people")
-make_chord('lt', function() set_current_screen(function() show_items("Tasks", data.tasks) end) end, "List tasks")
+    if view.cursor < 1 then view.cursor = 1 end
+
+    while view.cursor < view.start do
+      view.start = view.start - display.list_count
+    end
+    if view.start < 1 then view.start = 1 end
+
+    if view.cursor > #view.items then view.cursor = #view.items end
+
+    while view.start + display.list_count <= view.cursor do
+      view.start = view.start + display.list_count
+    end
+
+  else
+  
+    if to ~= nil then
+      view.start = to
+    else
+      view.start = view.start + by
+    end
+
+    if view.start < 1 then view.start = 1 end
+    if view.start > #view.items then view.start = #view.items end
+
+  end
+end
+
+local function scroll_up()
+  scroll_by(1)
+end
+
+-- Views
+
+local chords_view =
+{
+  title = " Chords ",
+  items = chords
+}
+
+local people_view = 
+{
+  title = ' People ',
+  items = data.people,
+  start = 1,
+  cursor = 1,
+}
+
+local tasks_view = 
+{
+  title = ' Tasks ',
+  items = data.tasks,
+  start = 1,
+  cursor = 1,
+}
+
+
+-- Edit in Vim
+
+local function edit_all_in_vim()
+  save_data()
+  os.execute(serdes.get_vim_cmdline(project.dir)) 
+  load_data()
+end
+
+-- 
+
+local function quit()
+  print(hl.RestoreScreen()())
+  print(hl.RestoreScreen()())
+  print(hl.RestoreScreen()())
+  os.exit(0)
+end
+
+-- Chords
+
+make_chord('?', function() set_current_screen(function() show_view(chords_view) end) end, "Show chords help")
+make_chord('<^H>', function() set_current_screen(function() show_items("Chords", chords) end) end, "Show chords help")
+
+make_chord('l', function() end, "List", true)
+
+make_chord('lp', function() set_current_screen(function() show_view(people_view) end) end, "List people")
+make_chord('lt', function() set_current_screen(function() show_view(tasks_view) end) end, "List tasks")
 make_chord('lc', function() set_current_screen(function() show_items("Customers", data.customers) end) end, "List customers")
 make_chord('lm', function() set_current_screen(function() show_items("Milestones", data.milestones) end) end, "List milestones")
 make_chord('ld', function() set_current_screen(function() show_items("Drones", data.drones) end) end, "List drones")
 
-make_chord(CTRL_'Q', function() display.print(hl.RestoreScreen()()); os.exit(0) end, 'Quit')
+make_chord('<^Q>', quit, 'Quit')
+make_chord('q', quit, 'Quit')
 
-make_chord(CTRL_'S', save_data, 'Save data')
-make_chord(CTRL_'O', load_data, 'Load data')
+make_chord('<^S>', save_data, 'Save data')
+make_chord('<^O>', load_data, 'Load data')
 
-make_chord('_DOWN_', function() display.view.start = display.view.start + 1 end, 'Scroll up')
-make_chord('_UP_', function() display.view.start = display.view.start - 1 end, 'Scroll down')
-make_chord('_PGDOWN_', function() display.view.start = display.view.start + display.list_count end, 'Scroll up')
-make_chord('_PGUP_', function() display.view.start = display.view.start - display.list_count end, 'Scroll down')
-make_chord('_HOME_', function() display.view.start = 1 end, 'Scroll down')
-make_chord('_END_', function() display.view.start = #display.view.items end, 'Scroll down')
+make_chord('<DOWN>', function() scroll{ by = 1 } end, 'Scroll up')
+make_chord('<UP>', function() scroll{ by = -1 } end, 'Scroll down')
+make_chord('<PGDOWN>', function() scroll{ by = display.list_count } end, 'Scroll page up')
+make_chord('<PGUP>', function() scroll{ by = -display.list_count } end, 'Scroll page down')
+make_chord('<HOME>', function() scroll{ to = 1 } end, 'First item')
+make_chord('<END>', function() scroll{ to = #display.view.items } end, 'Last item')
 
+make_chord('i', function() local s = read() end, 'Read')
+
+make_chord('e', function() end, 'Edit', true)
+make_chord('ea', function() edit_all_in_vim() end, 'Edit all in Vim')
 
 -- ------------------------------------------------------------------------------------------------------------------------
 
 do
   local key = 0
-  local chars = ''
   local chord = nil
 
-  display.print(hl.SaveScreen()())
+  print(hl.SaveScreen()())
+  print(hl.SaveScreen()())
+  print(hl.Reset()())
 
-  while chars ~= 'q' do
+  while true do
 
     display.show_border = show_border
     display.show_header = show_header
@@ -238,28 +338,21 @@ do
     display.draw()
  
     key = inkey()
-    -- print(hl.Cls())
  
-    chars = charsFor(key)
-    chord = chordFor(key)
+    chord = chord_for(key)
 
-
-   
-
-    -- print(hl.Locate(10, 40)() .. key .. " => [" .. current_chord .. "] ")
 
     if chord ~= nil then
       status_text = "Chord: .. [" ..current_chord .. "] key: [" .. key .. "]"
       local func = chord.func
       if func ~= nil then
         func()
-        pp(chord)
       end
     end  
 
   end
 
-  display.print(hl.RestoreScreen()())
+  --display.print(hl.RestoreScreen()())
 end
 
 
