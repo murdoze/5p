@@ -82,19 +82,24 @@ local function load_dir(dir)
   local people, tasks, customers, milestones, drones
 
   res, people = load_file(dir .. people_filename)
-  if not res then return res, people end
+  if not res then people = nil end
+  -- if not res then return res, people end
 
   res, tasks = load_file(dir .. tasks_filename)
-  if not res then return res, tasks end
+  if not res then tasks = nil end
+  -- if not res then return res, tasks end
 
   res, customers = load_file(dir .. customers_filename)
-  if not res then return res, customers end
+  if not res then customers = nil end
+  -- if not res then return res, customers end
 
   res, milestones = load_file(dir .. milestones_filename)
-  if not res then return res, milestones end
+  if not res then milestones = nil end
+  -- if not res then return res, milestones end
 
   res, drones = load_file(dir .. drones_filename)
-  if not res then return res, drones end
+  if not res then drones = nil end
+  -- if not res then return res, drones end
 
   local data = {}
   data.people = people
