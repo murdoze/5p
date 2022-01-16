@@ -18,9 +18,33 @@ local customers_filename = 'Customers.lua'
 local milestones_filename = 'Milestones.lua'
 local drones_filename = 'Drones.lua'
 
-local function dir_save(dir, filename, o)
-  
+local all_filenames = 
+{
+people_filename,
+tasks_filename,
+customers_filename,
+milestones_filename,
+drones_filename,
+}
+
+-- Editing in Vim
+
+local function get_all_full_filenames(dir)
+  local t = {}
+
+  for _, filename in ipairs(all_filenames) do
+    table.insert(t, dir .. filename)
+  end
+
+  return table.concat(t, " ")
 end
+
+local function get_vim_cmdline(dir)
+  return "vim "
+    .. " -p " .. get_all_full_filenames(dir)
+end
+
+-- Loading and saving files
 
 local function load_file(file)
   local f, err = io.open(file, "r")
@@ -64,13 +88,13 @@ local function load_dir(dir)
   if not res then return res, tasks end
 
   res, customers = load_file(dir .. customers_filename)
-  if not res then return res, tasks end
+  if not res then return res, customers end
 
   res, milestones = load_file(dir .. milestones_filename)
-  if not res then return res, tasks end
+  if not res then return res, milestones end
 
   res, drones = load_file(dir .. drones_filename)
-  if not res then return res, tasks end
+  if not res then return res, drones end
 
   local data = {}
   data.people = people
@@ -112,5 +136,6 @@ end
 
 serdes.load_dir = load_dir
 serdes.save_dir = save_dir
+serdes.get_vim_cmdline = get_vim_cmdline
 
 return serdes
