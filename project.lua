@@ -328,6 +328,33 @@ local tasks_view =
   update = function(self) self.items = data.tasks end
 }
 
+local customers_view =
+{  
+  title = ' Customers ',
+  items = nil,
+  start = 1,
+  cursor = 1,
+  update = function(self) self.items = data.customers end
+}
+
+local milestones_view =
+{  
+  title = ' Milestones ',
+  items = nil,
+  start = 1,
+  cursor = 1,
+  update = function(self) self.items = data.milestones end
+}
+
+local drones_view =
+{  
+  title = ' Drones ',
+  items = nil,
+  start = 1,
+  cursor = 1,
+  update = function(self) self.items = data.drones end
+}
+
 
 -- Edit in Vim
 
@@ -460,9 +487,9 @@ make_chord('--------------------------------------------')
 make_chord('l', function() set_current_screen(function() show_view(chords_list_view) end) end, "List", true)
 make_chord('lp', function() set_current_screen(function() show_view(people_view) end) end, "List people")
 make_chord('lt', function() set_current_screen(function() show_view(tasks_view) end) end, "List tasks")
-make_chord('lc', function() set_current_screen(function() show_items("Customers", data.customers) end) end, "List customers")
-make_chord('lm', function() set_current_screen(function() show_items("Milestones", data.milestones) end) end, "List milestones")
-make_chord('ld', function() set_current_screen(function() show_items("Drones", data.drones) end) end, "List drones")
+make_chord('lc', function() set_current_screen(function() show_view(customers_view) end) end, "List customers")
+make_chord('lm', function() set_current_screen(function() show_view(milestones_view) end) end, "List milestones")
+make_chord('ld', function() set_current_screen(function() show_view(drones_view) end) end, "List drones")
 make_chord('<DOWN>', function() scroll{ by = 1 } end, 'Scroll up')
 make_chord('<UP>', function() scroll{ by = -1 } end, 'Scroll down')
 make_chord('<PGDOWN>', function() scroll{ by = display.list_count } end, 'Scroll page up')
