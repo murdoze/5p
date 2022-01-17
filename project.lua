@@ -42,8 +42,23 @@ end
 
 -- Deep copy
 
+-- http://lua-users.org/wiki/CopyTable -- modified, no metatables
+local function deepcopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+            copy[deepcopy(orig_key)] = deepcopy(orig_value)
+        end
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
+
 local function copy(t)
-  return t
+  return deepcopy(t)
 end
 
 -- Status
@@ -122,6 +137,7 @@ local function chars_for(key)
   local keymap =
   {
     [10] = '<ENTER>',
+    [27] = '<ESC>',
     [262] = '<HOME>',
     [360] = '<END>',
     [259] = '<UP>',
@@ -224,6 +240,21 @@ local function show_status()
   display.print_line(hl.White() .. hl.BgBlue() .. status_text)
 end
 
+local function show_related(items)
+  if items == nil then return "" end
+
+  local s = "["
+
+  for i, it in ipairs(items) do
+    if i > 1 then s = s .. "|" end
+    s = s .. it.name
+  end
+
+  s = s .. "]"
+
+  return s
+end
+
 local function show_items(title, items)
   show_title(title)
   display.print("(" .. tostring(#items) .. ")")
@@ -252,7 +283,7 @@ local function show_items(title, items)
 
       local selected = " "
       if display.view.selected ~= nil then
-        for _, sit in ipairs(display.view.selected) do
+        for _, sit in ipairs(display.view.selected.items) do
 	  if it.id == sit.id then
 	      selected = "+"
 	    break
@@ -260,7 +291,18 @@ local function show_items(title, items)
 	end
       end
 
+      local related = ""
+
+      if it.related ~= nil then
+        related = show_related(it.related.people.items) 
+          .. show_related(it.related.labels.items) 
+          .. show_related(it.related.drones.items) 
+          .. show_related(it.related.customers.items) 
+          .. show_related(it.related.milestones.items) 
+      end
+
       display.print_line(" " .. cursor .. selected .. " " .. hl.Yellow() .. string.format("%6d", i) .. hl.Off() .. ". " .. hl.align(nonnull.value(it.name, '?'), 20) .. " " 
+        .. hl.Bold() .. related .. hl.Off()
         .. hl.Faint() .. nonnull.value(it.text, ''))
 
       lines = lines - 1
@@ -454,7 +496,7 @@ local function copy_item(it)
   r.id = nil
   r.name = it.name
   r.text = it.text
-  r.related = it.related -- TODO: deep copy !!!!!!
+  r.related = copy(it.related) 
 
   return r
 end
@@ -463,9 +505,20 @@ local function get_current_item()
   local cursor = display.view.cursor
   if cursor == nil then return nil end
   
-  local it = display.view.items[cursor]
+  local item = display.view.items[cursor]
 
-  return it
+  return item
+end
+
+local function get_current_item_and_related()
+  local item = get_current_item()
+  if item == nil then return nil end
+
+  if item.related == nil then
+    item.related = copy(display.view.items.related)
+  end
+
+  return item
 end
 
 local function edit_current_item(field)
@@ -510,7 +563,7 @@ local function paste_item()
   it.id = genid()
   it.name = yanked_item.name
   it.text = yanked_item.text
-  it.related = yanked_item.labels
+  it.related = copy(yanked_item.related)
 
   table.insert(display.view.items, cursor, it)
 end
@@ -518,7 +571,8 @@ end
 -- Selecting items
 
 local function select(args)
-  local title = nonnull.value(args.title, ' Select: ')
+  -- local title = nonnull.value(args.title, ' Select: ')
+  local title = args.title or ' Select: '
   local items = args.items
   local multiselect = nonnull.value(args.multiselect, false)
   local selected = args.selected
@@ -544,28 +598,28 @@ local function choose_items()
     local item = view.items[view.cursor]
     if view.multiselect then
       local exists = false
-      for i, it in ipairs(view.selected) do
+      for i, it in ipairs(view.selected.items) do
         if it.id == item.id then
 	  exists = true
-	  table.remove(view.selected, i) 
+	  table.remove(view.selected.items, i) 
 	  break
 	end
       end
       if not exists then
-        table.insert(view.selected, { name = item.name, id = item.id })
+        table.insert(view.selected.items, { name = item.name, id = item.id })
       end
     else
-      table.remove()
-      view.selected = { { name = item.name, id = item.id } }
+      view.selected.items = { { name = item.name, id = item.id } }
     end
   end
 end
 
 local function select_person()
-  local item = get_current_item()
+  local item = get_current_item_and_related()
   if item == nil then return end
 
-  select{ title = ' Select person ', items = data.people, multiselect = false, selected = {} }
+  local selected = item.related.people
+  select{ title = ' Select person ', items = data.people, multiselect = true, selected = selected }
 end
 
 local function select_customer()
@@ -575,7 +629,7 @@ local function select_customer()
   local t = display.view.items.type
 
   if t == data.Type.Task then
-    select{ title = ' Select customers ', items = data.customers, multiselect = true, selected = item.customers }
+    select{ title = nil, items = data.customers, multiselect = true, selected = item.customers }
   end
 
   if t == data.Type.Task then
@@ -594,6 +648,14 @@ local function select_drone()
   select{ title = ' Select drones ', items = data.drones, multiselect = true, selected = {} }
 end
 
+local function return_to_prev_view()
+  if display.prev_view ~= nil then
+    if nonnull.value(display.view.selecting, false) then
+      set_current_screen(function() show_view(display.prev_view) end)
+    end
+  end
+end
+
 -- Enter key multimodal handler (could do better)
 
 local function handle_enter()
@@ -604,12 +666,13 @@ local function handle_enter()
     inkey()
   else
     -- Choosing item(s)
-    if display.prev_view ~= nil then
-      if nonnull.value(display.view.selecting, false) then
-        set_current_screen(function() show_view(display.prev_view) end)
-      end
-    end
-  end
+    return_to_prev_view()
+ end
+end
+
+
+local function handle_escape()
+  return_to_prev_view()  
 end
 
 -- Saving and Quitting 
@@ -666,6 +729,7 @@ make_chord('et', function() edit_current_item'text' end, 'Edit text in Vim')
 make_chord('--------------------------------------------')
 make_chord('/', function() input.in_search = true; input.search_str = '' end, 'Search')
 make_chord('<ENTER>', function() handle_enter() end, 'Do search! / Accept selection')
+make_chord('<ESC>', function() handle_escape() end, 'Accept selection via escape')
 make_chord('g', function() if input.last_number ~= 0 then current_chord = ''; scroll{ to = input.last_number }; input.number = 0; input.last_number = 0; end end, 'Go to...', true)
 make_chord('--------------------------------------------')
 make_chord('s', function() end, 'Select', true)
