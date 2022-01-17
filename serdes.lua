@@ -17,6 +17,7 @@ local tasks_filename = 'Tasks.lua'
 local customers_filename = 'Customers.lua'
 local milestones_filename = 'Milestones.lua'
 local drones_filename = 'Drones.lua'
+local labels_filename = 'Labels.lua'
 
 local all_filenames = 
 {
@@ -25,6 +26,7 @@ tasks_filename,
 customers_filename,
 milestones_filename,
 drones_filename,
+labels_file_name,
 }
 
 -- Editing in Vim
@@ -79,27 +81,25 @@ end
 
 local function load_dir(dir)
   local res = true
-  local people, tasks, customers, milestones, drones
+  local people, tasks, customers, milestones, drones, labels
 
   res, people = load_file(dir .. people_filename)
   if not res then people = nil end
-  -- if not res then return res, people end
 
   res, tasks = load_file(dir .. tasks_filename)
   if not res then tasks = nil end
-  -- if not res then return res, tasks end
 
   res, customers = load_file(dir .. customers_filename)
   if not res then customers = nil end
-  -- if not res then return res, customers end
 
   res, milestones = load_file(dir .. milestones_filename)
   if not res then milestones = nil end
-  -- if not res then return res, milestones end
 
   res, drones = load_file(dir .. drones_filename)
   if not res then drones = nil end
-  -- if not res then return res, drones end
+
+  res, labels = load_file(dir .. labels_filename)
+  if not res then labels = nil end
 
   local data = {}
   data.people = people
@@ -107,15 +107,12 @@ local function load_dir(dir)
   data.customers = customers
   data.milestones = milestones
   data.drones = drones
-
-  -- Fixup references
+  data.labels = labels
 
   return true, data
 end
 
 local function save_dir(dir, data)
-  -- Unfixup references
-
   local res, err
 
   res, err = save_file(dir .. people_filename, data.people)
@@ -133,7 +130,8 @@ local function save_dir(dir, data)
   res, err = save_file(dir .. drones_filename, data.drones)
   if not res then return res, err end
 
-  -- Fixup references back
+  res, err = save_file(dir .. labels_filename, data.labels)
+  if not res then return res, err end
 
   return true
 end

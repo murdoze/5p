@@ -10,14 +10,111 @@ local Type =
   Customer = 'CUSTOMER',
   Milestone = 'MILESTONE',
   Drone = 'DRONE',
+  Label = 'LABEL',
 
 }
 
-local people = { type = Type.Person }
-local tasks = { type = Type.Task }
-local customers = { type = Type.Customer }
-local milestones = { type = Type.Milestone }
-local drones = { type = Type.Drone }
+local people = 
+{ 
+  type = Type.Person,
+  related =
+  {
+    labels =
+    {
+      multiple = true,
+      items = {}
+    }
+  }
+}
+
+local tasks = 
+{ 
+  type = Type.Task,
+  related =
+  {
+    labels =
+    {
+      multiple = true,
+      items = {}
+    },
+    people = 
+    {
+      multiple = false,
+      items = {}
+    },
+    drones =
+    {
+      multiple = true,
+    },
+    customers =
+    {
+      multiple = true,
+      items = {}
+    },
+    milestones =
+    {
+      multiple = true,
+      items = {}
+    }
+  }
+}
+
+local customers = 
+{ 
+  type = Type.Customer,
+  related =
+  {
+    labels =
+    {
+      multiple = true,
+      items = {}
+    }
+  }
+}
+
+local milestones =
+{
+  type = Type.Milestone,
+  related =
+  {
+    labels =
+    {
+      multiple = true,
+      items = {}
+    },
+    customers =
+    {
+      multiple = false,
+      items = {}
+    },
+    drones =
+    {
+      multiple = true,
+      items = {}
+    }
+  }
+}
+
+local drones = 
+{ 
+  type = Type.Drone,
+  related =
+  {
+    labels =
+    {
+      multiple = true,
+      items = {}
+    }
+  }
+}
+
+local labels = 
+{ 
+  type = Type.Label,
+  related =
+  {
+  }
+}
 
 data.Type = Type
 
@@ -26,6 +123,7 @@ data.tasks = tasks
 data.customers = customers
 data.milestones = milestones
 data.drones = drones
+data.labels = labels
 
 -- Data Base
 

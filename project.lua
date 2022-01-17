@@ -1,8 +1,16 @@
-local pp, inkey, push, read = unpack(require 'lib/all')
+-- Imports
+
+package.cpath='./ext/?/?.so;'..package.cpath
+package.path='./lib/?.lua;'..package.path
 
 local hl = require'highlight'
 local nonnull = require'nonnull'
+
 local serpent = require'serpent'
+local pp = function(_) print(serpent.block(_, { nocode = true, sortkeys = true, comment = false })) end
+
+local kb = require'kb'
+local inkey = function() return kb.getch() end
 
 local display = require'display'
 
@@ -12,6 +20,32 @@ local serdes = require'serdes'
 
 require'noglobals'
 
+-- String utilities
+
+string.pad = function(s, width, char)
+  local pad = width - string.len(s)
+  if pad > 0 then
+    if char == nil then char = ' ' end
+    return s .. string.rep(char, pad)
+  else
+    return s
+  end
+end
+
+string.cut = function(s, width)
+  if string.len(s) > width then
+    return string.sub(s, 1, width)
+  else
+    return s
+  end
+end
+
+-- Deep copy
+
+local function copy(t)
+  return t
+end
+
 -- Status
 
 local status_text = 'Status normal'
@@ -20,7 +54,7 @@ local status_text = 'Status normal'
 
 local project = {}
 
-project.dir = "./examples/project1/"
+project.dir = "./examples/project2/"
 
 local function load_data()
   local res, new_data = serdes.load_dir(project.dir)
@@ -34,6 +68,7 @@ local function load_data()
   data.customers = nonnull.value(new_data.customers, data.customers)
   data.milestones = nonnull.value(new_data.milestones, data.milestones)
   data.drones = nonnull.value(new_data.drones, data.drones)
+  data.labels = nonnull.value(new_data.labels, data.labels)
 
   status_text = "Loaded project data from " .. project.dir
 end
@@ -208,12 +243,25 @@ local function show_items(title, items)
     if i >= display.view.start then
       local current_line = display.list_begin_line + i - 1 - display.view.start
       display.locate(current_line)
+
       local cursor = " "
       if i == display.view.cursor then
         cursor = hl.Green() .. hl.Bold() .. ">" .. hl.Off()
 	cursor_line = current_line
       end
-      display.print_line(" " .. cursor .. " " .. hl.Yellow() .. string.format("%6d", i) .. hl.Off() .. ". " .. hl.align(nonnull.value(it.name, '?'), 20) .. " " .. hl.Faint() .. nonnull.value(it.text, ''))
+
+      local selected = " "
+      if display.view.selected ~= nil then
+        for _, sit in ipairs(display.view.selected) do
+	  if it.id == sit.id then
+	      selected = "+"
+	    break
+	  end
+	end
+      end
+
+      display.print_line(" " .. cursor .. selected .. " " .. hl.Yellow() .. string.format("%6d", i) .. hl.Off() .. ". " .. hl.align(nonnull.value(it.name, '?'), 20) .. " " 
+        .. hl.Faint() .. nonnull.value(it.text, ''))
 
       lines = lines - 1
       if lines <= 0 then break end
@@ -313,7 +361,7 @@ local chords_list_view =
 local people_view = 
 {
   title = ' People ',
-  items = {},
+  items = nil,
   start = 1,
   cursor = 1,
   update = function(self) self.items = data.people end
@@ -322,7 +370,7 @@ local people_view =
 local tasks_view = 
 {
   title = ' Tasks ',
-  items = data.tasks,
+  items = nil,
   start = 1,
   cursor = 1,
   update = function(self) self.items = data.tasks end
@@ -353,6 +401,16 @@ local drones_view =
   start = 1,
   cursor = 1,
   update = function(self) self.items = data.drones end
+}
+
+
+local labels_view =
+{  
+  title = ' Labels ',
+  items = nil,
+  start = 1,
+  cursor = 1,
+  update = function(self) self.items = data.labels end
 }
 
 
@@ -396,8 +454,7 @@ local function copy_item(it)
   r.id = nil
   r.name = it.name
   r.text = it.text
-  r.labels = it.labels
-  r.assigned_to = it.assigned_to
+  r.related = it.related -- TODO: deep copy !!!!!!
 
   return r
 end
@@ -423,6 +480,7 @@ local function delete_current_item()
   if cursor == nil then return nil end
 
   local it = table.remove(display.view.items, cursor)
+  if it == nil then return end
 
   yanked_item = copy_item(it)
 
@@ -434,6 +492,7 @@ end
 local function insert_item(offset)
   local cursor = display.view.cursor
   if cursor == nil then return nil end
+  if cursor == 0 then offset = 1 end
 
   local it = {}
   it.id = genid()
@@ -451,8 +510,7 @@ local function paste_item()
   it.id = genid()
   it.name = yanked_item.name
   it.text = yanked_item.text
-  it.labels = yanked_item.labels
-  it.assigned_to = yanked_item.assigned_to
+  it.related = yanked_item.labels
 
   table.insert(display.view.items, cursor, it)
 end
@@ -460,41 +518,97 @@ end
 -- Selecting items
 
 local function select(args)
-  local items = nonnull.value(args.items, {})
-  local multiple = nonull.value(args.multiple, false)
-  local selected = nonnull.value({})
+  local title = nonnull.value(args.title, ' Select: ')
+  local items = args.items
+  local multiselect = nonnull.value(args.multiselect, false)
+  local selected = args.selected
 
-  local prev_view = display.view
+  display.prev_view = display.view
 
   local view =
   {
+    title = title,
     items = items,
     start = 1,
     cursor = 1,
+    selecting = true,
+    multiselect = multiselect,
+    selected = selected,
   }
-
+  set_current_screen(function() show_view(view) end)
 end
 
 local function choose_items()
+  local view = display.view
+  if nonnull.value(view.selecting, false) then
+    local item = view.items[view.cursor]
+    if view.multiselect then
+      local exists = false
+      for i, it in ipairs(view.selected) do
+        if it.id == item.id then
+	  exists = true
+	  table.remove(view.selected, i) 
+	  break
+	end
+      end
+      if not exists then
+        table.insert(view.selected, { name = item.name, id = item.id })
+      end
+    else
+      table.remove()
+      view.selected = { { name = item.name, id = item.id } }
+    end
+  end
 end
 
 local function select_person()
+  local item = get_current_item()
+  if item == nil then return end
+
+  select{ title = ' Select person ', items = data.people, multiselect = false, selected = {} }
 end
 
 local function select_customer()
+  local item = get_current_item()
+  if item == nil then return end
+
+  local t = display.view.items.type
+
+  if t == data.Type.Task then
+    select{ title = ' Select customers ', items = data.customers, multiselect = true, selected = item.customers }
+  end
+
+  if t == data.Type.Task then
+  end
+
+  if t == data.Type.Task then
+  end
+
+
 end
 
 local function select_drone()
+  local item = get_current_item()
+  if item == nil then return end
+
+  select{ title = ' Select drones ', items = data.drones, multiselect = true, selected = {} }
 end
 
 -- Enter key multimodal handler (could do better)
 
 local function handle_enter()
   if input.in_search then
+    -- Search
     input.in_search = false
     print(input.search_str)
     inkey()
   else
+    -- Choosing item(s)
+    if display.prev_view ~= nil then
+      if nonnull.value(display.view.selecting, false) then
+        set_current_screen(function() show_view(display.prev_view) end)
+      end
+    end
   end
 end
 
@@ -532,6 +646,7 @@ make_chord('lt', function() set_current_screen(function() show_view(tasks_view) 
 make_chord('lc', function() set_current_screen(function() show_view(customers_view) end) end, "List customers")
 make_chord('lm', function() set_current_screen(function() show_view(milestones_view) end) end, "List milestones")
 make_chord('ld', function() set_current_screen(function() show_view(drones_view) end) end, "List drones")
+make_chord('ll', function() set_current_screen(function() show_view(labels_view) end) end, "List labels")
 make_chord('<DOWN>', function() scroll{ by = 1 } end, 'Scroll up')
 make_chord('<UP>', function() scroll{ by = -1 } end, 'Scroll down')
 make_chord('<PGDOWN>', function() scroll{ by = display.list_count } end, 'Scroll page up')
@@ -550,7 +665,7 @@ make_chord('en', function() edit_current_item'name' end, 'Edit name in Vim')
 make_chord('et', function() edit_current_item'text' end, 'Edit text in Vim')
 make_chord('--------------------------------------------')
 make_chord('/', function() input.in_search = true; input.search_str = '' end, 'Search')
-make_chord('<CR>', function() handle_enter() end, 'Do search! / Accept selection')
+make_chord('<ENTER>', function() handle_enter() end, 'Do search! / Accept selection')
 make_chord('g', function() if input.last_number ~= 0 then current_chord = ''; scroll{ to = input.last_number }; input.number = 0; input.last_number = 0; end end, 'Go to...', true)
 make_chord('--------------------------------------------')
 make_chord('s', function() end, 'Select', true)
@@ -585,6 +700,8 @@ do
       local func = chord.func
       if func ~= nil then
         func()
+        -- local co = coroutine.create(func)
+	-- coroutine.resume(co)
       end
     end  
 
