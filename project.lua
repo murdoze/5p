@@ -86,7 +86,7 @@ local function chars_for(key)
 
   local keymap =
   {
-    [10] = '<CR>',
+    [10] = '<ENTER>',
     [262] = '<HOME>',
     [360] = '<END>',
     [259] = '<UP>',
@@ -457,9 +457,51 @@ local function paste_item()
   table.insert(display.view.items, cursor, it)
 end
 
--- 
+-- Selecting items
+
+local function select(args)
+  local items = nonnull.value(args.items, {})
+  local multiple = nonull.value(args.multiple, false)
+  local selected = nonnull.value({})
+
+  local prev_view = display.view
+
+  local view =
+  {
+    items = items,
+    start = 1,
+    cursor = 1,
+  }
+
+end
+
+local function choose_items()
+end
+
+local function select_person()
+end
+
+local function select_customer()
+end
+
+local function select_drone()
+end
+
+-- Enter key multimodal handler (could do better)
+
+local function handle_enter()
+  if input.in_search then
+    input.in_search = false
+    print(input.search_str)
+    inkey()
+  else
+  end
+end
+
+-- Saving and Quitting 
 
 local function quit()
+  print(hl.Reset()())
   print(hl.RestoreScreen()())
   os.exit(0)
 end
@@ -508,8 +550,14 @@ make_chord('en', function() edit_current_item'name' end, 'Edit name in Vim')
 make_chord('et', function() edit_current_item'text' end, 'Edit text in Vim')
 make_chord('--------------------------------------------')
 make_chord('/', function() input.in_search = true; input.search_str = '' end, 'Search')
-make_chord('<CR>', function() input.in_search = false; print(input.search_str); inkey() end, 'Do search!')
+make_chord('<CR>', function() handle_enter() end, 'Do search! / Accept selection')
 make_chord('g', function() if input.last_number ~= 0 then current_chord = ''; scroll{ to = input.last_number }; input.number = 0; input.last_number = 0; end end, 'Go to...', true)
+make_chord('--------------------------------------------')
+make_chord('s', function() end, 'Select', true)
+make_chord(' ', function() choose_items() end, 'Choose item(s)')
+make_chord('sp', function() select_person() end, 'Select person')
+make_chord('sc', function() select_customer() end, 'Select customer')
+make_chord('sd', function() select_drone() end, 'Select drone')
 
 -- ------------------------------------------------------------------------------------------------------------------------
 
@@ -532,7 +580,6 @@ do
     key = inkey()
 
     chord = chord_for(key)
-
 
     if chord ~= nil then
       local func = chord.func
