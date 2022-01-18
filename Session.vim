@@ -3,29 +3,32 @@ if &cp | set nocp | endif
 let s:cpo_save=&cpo
 set cpo&vim
 inoremap <C-U> u
-map  :wa:!make
+map 
+
+ :wa
+:!make
 vmap  "*d
 omap <silent> % <Plug>(MatchitOperationForward)
 xmap <silent> % <Plug>(MatchitVisualForward)
 nmap <silent> % <Plug>(MatchitNormalForward)
-noremap ;,i :call rtags#SymbolInfo()
-noremap ;; :call rtags#JumpTo(g:SAME_WINDOW)
-noremap ;,J :call rtags#JumpTo(g:SAME_WINDOW, { '--declaration-only' : '' })
-noremap ;,S :call rtags#JumpTo(g:H_SPLIT)
-noremap ;,V :call rtags#JumpTo(g:V_SPLIT)
-noremap ;,T :call rtags#JumpTo(g:NEW_TAB)
-noremap ;,p :call rtags#JumpToParent()
-noremap ;,f :call rtags#FindRefs()
-noremap ;,F :call rtags#FindRefsCallTree()
-noremap ;,n :call rtags#FindRefsByName(input("Pattern? ", "", "customlist,rtags#CompleteSymbols"))
-noremap ;,s :call rtags#FindSymbols(input("Pattern? ", "", "customlist,rtags#CompleteSymbols"))
-noremap ;,r :call rtags#ReindexFile()
-noremap ;,l :call rtags#ProjectList()
-noremap ;,w :call rtags#RenameSymbolUnderCursor()
-noremap ;,v :call rtags#FindVirtuals()
-noremap ;,b :call rtags#JumpBack()
-noremap ;,C :call rtags#FindSuperClasses()
-noremap ;,c :call rtags#FindSubClasses()
+noremap ;,i :call rtags#SymbolInfo()
+noremap ;; :call rtags#JumpTo(g:SAME_WINDOW)
+noremap ;,J :call rtags#JumpTo(g:SAME_WINDOW, { '--declaration-only' : '' })
+noremap ;,S :call rtags#JumpTo(g:H_SPLIT)
+noremap ;,V :call rtags#JumpTo(g:V_SPLIT)
+noremap ;,T :call rtags#JumpTo(g:NEW_TAB)
+noremap ;,p :call rtags#JumpToParent()
+noremap ;,f :call rtags#FindRefs()
+noremap ;,F :call rtags#FindRefsCallTree()
+noremap ;,n :call rtags#FindRefsByName(input("Pattern? ", "", "customlist,rtags#CompleteSymbols"))
+noremap ;,s :call rtags#FindSymbols(input("Pattern? ", "", "customlist,rtags#CompleteSymbols"))
+noremap ;,r :call rtags#ReindexFile()
+noremap ;,l :call rtags#ProjectList()
+noremap ;,w :call rtags#RenameSymbolUnderCursor()
+noremap ;,v :call rtags#FindVirtuals()
+noremap ;,b :call rtags#JumpBack()
+noremap ;,C :call rtags#FindSuperClasses()
+noremap ;,c :call rtags#FindSubClasses()
 imap ÎÔ *
 map! Îu <C-End>
 map! Îw <C-Home>
@@ -42,24 +45,29 @@ xmap <silent> g% <Plug>(MatchitVisualBackward)
 nmap <silent> g% <Plug>(MatchitNormalBackward)
 vmap gx <Plug>NetrwBrowseXVis
 nmap gx <Plug>NetrwBrowseX
-map <C-M><C-M> :wa:!make
+map <C-M><C-M> :wa
+:!make
 map <C-1><C-1> 1gt
 map <F7> :! echo "You hit F7!" 
 xmap <silent> <Plug>(MatchitVisualTextObject) <Plug>(MatchitVisualMultiBackward)o<Plug>(MatchitVisualMultiForward)
-onoremap <silent> <Plug>(MatchitOperationMultiForward) :call matchit#MultiMatch("W",  "o")
-onoremap <silent> <Plug>(MatchitOperationMultiBackward) :call matchit#MultiMatch("bW", "o")
-xnoremap <silent> <Plug>(MatchitVisualMultiForward) :call matchit#MultiMatch("W",  "n")m'gv``
-xnoremap <silent> <Plug>(MatchitVisualMultiBackward) :call matchit#MultiMatch("bW", "n")m'gv``
-nnoremap <silent> <Plug>(MatchitNormalMultiForward) :call matchit#MultiMatch("W",  "n")
-nnoremap <silent> <Plug>(MatchitNormalMultiBackward) :call matchit#MultiMatch("bW", "n")
-onoremap <silent> <Plug>(MatchitOperationBackward) :call matchit#Match_wrapper('',0,'o')
-onoremap <silent> <Plug>(MatchitOperationForward) :call matchit#Match_wrapper('',1,'o')
-xnoremap <silent> <Plug>(MatchitVisualBackward) :call matchit#Match_wrapper('',0,'v')m'gv``
-xnoremap <silent> <Plug>(MatchitVisualForward) :call matchit#Match_wrapper('',1,'v')m'gv``
-nnoremap <silent> <Plug>(MatchitNormalBackward) :call matchit#Match_wrapper('',0,'n')
-nnoremap <silent> <Plug>(MatchitNormalForward) :call matchit#Match_wrapper('',1,'n')
-vnoremap <silent> <Plug>NetrwBrowseXVis :call netrw#BrowseXVis()
-nnoremap <silent> <Plug>NetrwBrowseX :call netrw#BrowseX(netrw#GX(),netrw#CheckIfRemote(netrw#GX()))
+onoremap <silent> <Plug>(MatchitOperationMultiForward) :call matchit#MultiMatch("W",  "o")
+onoremap <silent> <Plug>(MatchitOperationMultiBackward) :call matchit#MultiMatch("bW", "o")
+xnoremap <silent> <Plug>(MatchitVisualMultiForward) :call matchit#MultiMatch("W",  "n")
+m'gv``
+xnoremap <silent> <Plug>(MatchitVisualMultiBackward) :call matchit#MultiMatch("bW", "n")
+m'gv``
+nnoremap <silent> <Plug>(MatchitNormalMultiForward) :call matchit#MultiMatch("W",  "n")
+nnoremap <silent> <Plug>(MatchitNormalMultiBackward) :call matchit#MultiMatch("bW", "n")
+onoremap <silent> <Plug>(MatchitOperationBackward) :call matchit#Match_wrapper('',0,'o')
+onoremap <silent> <Plug>(MatchitOperationForward) :call matchit#Match_wrapper('',1,'o')
+xnoremap <silent> <Plug>(MatchitVisualBackward) :call matchit#Match_wrapper('',0,'v')
+m'gv``
+xnoremap <silent> <Plug>(MatchitVisualForward) :call matchit#Match_wrapper('',1,'v')
+m'gv``
+nnoremap <silent> <Plug>(MatchitNormalBackward) :call matchit#Match_wrapper('',0,'n')
+nnoremap <silent> <Plug>(MatchitNormalForward) :call matchit#Match_wrapper('',1,'n')
+vnoremap <silent> <Plug>NetrwBrowseXVis :call netrw#BrowseXVis()
+nnoremap <silent> <Plug>NetrwBrowseX :call netrw#BrowseX(netrw#GX(),netrw#CheckIfRemote(netrw#GX()))
 inoremap  u
 nmap Îu <C-End>
 nmap Îw <C-Home>
