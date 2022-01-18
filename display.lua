@@ -21,6 +21,12 @@ display.status_line = -1
 display.list_begin_line = display.title_line + 3
 
 display.get_window_size = function()
+  if is_windows then
+    --TODO: implement logic
+    return
+  end
+
+
   local tmp_lines=os.tmpname()
   local tmp_cols=os.tmpname()
   os.execute("tput lines > " .. tmp_lines)
@@ -32,6 +38,7 @@ display.get_window_size = function()
 
   display.height = h
   display.width = w
+
 end
 
 display.handle_resize = function()
