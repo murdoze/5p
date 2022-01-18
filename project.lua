@@ -11,7 +11,7 @@ end
 if is_windows then
   package.cpath = '.\\ext\\?\\' .. package.cpath
 else
-  package.cpath = './ext/?/?.so' .. package.cpath
+  package.cpath = './ext/?/?.so;' .. package.cpath
 end
 
 package.path='./lib/?.lua;'..package.path
