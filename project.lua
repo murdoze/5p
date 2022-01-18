@@ -155,17 +155,33 @@ local function chars_for(key)
     return ''
   end
 
-  local keymap =
-  {
-    [10] = '<ENTER>',
-    [27] = '<ESC>',
-    [262] = '<HOME>',
-    [360] = '<END>',
-    [259] = '<UP>',
-    [258] = '<DOWN>',
-    [339] = '<PGUP>',
-    [338] = '<PGDOWN>',
-  }
+  local keymap
+
+  if is_windows then 
+    keymap = 
+    {
+      [10] = '<ENTER>',
+      [27] = '<ESC>',
+      [71] = '<HOME>',
+      [79] = '<END>',
+      [72] = '<UP>',
+      [80] = '<DOWN>',
+      [73] = '<PGUP>',
+      [81] = '<PGDOWN>',
+    }
+  else
+    keymap = 
+    {
+      [10] = '<ENTER>',
+      [27] = '<ESC>',
+      [262] = '<HOME>',
+      [360] = '<END>',
+      [259] = '<UP>',
+      [258] = '<DOWN>',
+      [339] = '<PGUP>',
+      [338] = '<PGDOWN>',
+    }
+   end
 
   local cmd = keymap[key]
   if cmd == nil then
