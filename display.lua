@@ -17,6 +17,7 @@ display.header_line = 2
 display.title_line = display.header_line + 2
 display.list_count = 0
 display.status_line = -1
+display.keystatus_line = -1
 
 display.list_begin_line = display.title_line + 3
 
@@ -42,7 +43,8 @@ display.get_window_size = function()
 end
 
 display.handle_resize = function()
-  display.status_line = display.height - 1
+  display.status_line = display.height - 2
+  display.keystatus_line = display.height - 1
   display.list_count = display.status_line - display.list_begin_line - 1
 end
 

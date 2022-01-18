@@ -79,6 +79,7 @@ end
 -- Status
 
 local status_text = 'Status normal'
+local keystatus_text = 'Key status normal'
 
 -- Project
 
@@ -111,6 +112,8 @@ local function save_data()
   local res, err = serdes.save_dir(project.dir, data)
   if not res then
     status_text = hl.White() .. hl.BgRed() .. err
+  else  
+    status_text = hl.White() .. hl.BgGreen() .. "Data saved to " .. project.dir
   end
 
   return res
@@ -276,7 +279,12 @@ end
 
 local function show_status()
   display.locate(display.status_line)
-  display.print_line(hl.White() .. hl.BgBlue() .. status_text)
+  display.print_line(status_text)
+end
+
+local function show_keystatus()
+  display.locate(display.keystatus_line)
+  display.print_line(hl.White() .. hl.BgBlue() .. keystatus_text)
 end
 
 local function show_related(items)
@@ -796,11 +804,12 @@ do
 
     display.show_border = show_border
     display.show_header = show_header
-    display.show_status = show_status
+    display.show_status = function() show_status(); show_keystatus() end
 
     display.draw()
  
     key = inkey()
+    status_text = ''
 
     chord = chord_for(key)
 
@@ -813,9 +822,9 @@ do
       end
     end  
 
-    status_text = "Chord .. [" .. last_chord .. "] Key [" .. tostring(key) .. "]"
-    if input.number ~= 0 then status_text = status_text .. " Number [" .. tostring(input.number) .. "]" end
-    if input.in_search then status_text = status_text .. " Search [" .. input.search_str .. "]" end
+    keystatus_text = "Chord .. [" .. last_chord .. "] Key [" .. tostring(key) .. "]"
+    if input.number ~= 0 then keystatus_text = keystatus_text .. " Number [" .. tostring(input.number) .. "]" end
+    if input.in_search then keystatus_text = keystatus_text .. " Search [" .. input.search_str .. "]" end
 
   end
 end
