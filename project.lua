@@ -1,7 +1,22 @@
--- Imports
+-- OS-dependent logic
 
-package.cpath='./ext/?/?.so;'..package.cpath
+is_windows = false
+
+if jit and jit.os then
+  if jit.os == 'Windows' then is_windows = true end
+end
+
+-- Paths
+
+if is_windows then
+  package.cpath = '.\\ext\\?\\' .. package.cpath
+else
+  package.cpath = './ext/?/?.so' .. package.cpath
+end
+
 package.path='./lib/?.lua;'..package.path
+
+-- Imports
 
 local hl = require'highlight'
 local nonnull = require'nonnull'
@@ -69,7 +84,11 @@ local status_text = 'Status normal'
 
 local project = {}
 
-project.dir = "./examples/project2/"
+if is_windows then
+  project.dir = ".\\examples\\project2\\"
+else
+  project.dir = "./examples/project2/"
+end
 
 local function load_data()
   local res, new_data = serdes.load_dir(project.dir)
@@ -93,6 +112,8 @@ local function save_data()
   if not res then
     status_text = hl.White() .. hl.BgRed() .. err
   end
+
+  return res
 end
 
 -- Chord processing
@@ -465,7 +486,11 @@ local function edit_all_in_vim()
 end
 
 local function edit_in_vim(s)
-  local tempfile = os.tmpname()  
+  local tempfile = os.tmpname()
+
+  if is_windows then
+    tempfile = os.getenv'TEMP' .. '\\' .. tempfile
+  end
 
   local f = io.open(tempfile, 'w+')
   if f ~= nil then
@@ -684,8 +709,9 @@ local function quit()
 end
 
 local function save_and_quit()
-  save_data()
-  quit()
+  if save_data() then
+    quit()
+  end
 end
 
 local function quit_no_save()
