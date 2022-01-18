@@ -144,7 +144,9 @@ local function chars_for(key)
       if key == 27 then
         input.in_search = false
       else
-        input.search_str = input.search_str .. string.char(key)
+        if key >= 32 and key <= 255 then
+          input.search_str = input.search_str .. string.char(key)
+	end
       end  
       return ''
     end  
