@@ -29,6 +29,25 @@ Also items may have
 ### Person
 
 
+Installation
+------------
+
+## Linux
+
+All trivial
+
+## Windows
+
+Use Windows 10 or above
+
+Enable ANSI control sequences:
+In Regedit: HKCU\VirtualTerminalLevel = (DWORD)0x1
+
+Use MinGW to compile LuaJIT
+
+https://www.mingw-w64.org/downloads/#mingw-builds
+https://luajit.org/install.html
+
 
 
 
