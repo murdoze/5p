@@ -1,2 +1,2 @@
 all:
-	luajit project.lua
+	luajit project.lua --project ./examples/5p
