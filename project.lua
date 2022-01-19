@@ -83,15 +83,27 @@ local keystatus_text = 'Key status normal'
 
 -- Project
 
-local project = {}
+local path_separator
 
 if is_windows then
-  project.dir = ".\\examples\\project2\\"
+  path_separator = "\\"
 else
-  project.dir = "./examples/project2/"
+  path_separator  = "/"
 end
 
+local project = {}
+
+project.dir = "." .. path_separator
+
 local function load_data()
+  local dirf, err = io.open(project.dir)
+  if not dirf then
+    status_text = hl.White() .. hl.BgRed() .. err
+    return
+  else
+    io.close(dirf)
+  end
+
   local res, new_data = serdes.load_dir(project.dir)
   if not res then
     status_text = hl.White() .. hl.BgRed() .. new_data
@@ -791,6 +803,32 @@ make_chord('sc', function() select_customer() end, 'Select customer')
 make_chord('sd', function() select_drone() end, 'Select drone')
 
 -- ------------------------------------------------------------------------------------------------------------------------
+
+-- Parse command line
+
+local function parse_cmdline(args)
+  local param = ''
+
+  for _, opt in pairs(args) do
+    pp(opt)
+    if param == '' then 
+      param = opt
+    else
+      if param == '-P' or param == '--project' then
+        project.dir = opt .. path_separator
+      end
+      if param == '--print' then
+        print(opt)
+      end
+
+      param = ''
+    end
+  end
+end
+
+-- Main loop
+
+parse_cmdline(arg)
 
 do
   local key = 0
