@@ -2,6 +2,8 @@
 
 local hl = require'highlight'
 
+local kb = require'kb' -- TODO: rename kb to console
+
 local display = {}
 local view = {}
 
@@ -22,20 +24,7 @@ display.keystatus_line = -1
 display.list_begin_line = display.title_line + 3
 
 display.get_window_size = function()
-  if is_windows then
-    --TODO: implement logic
-    return
-  end
-
-
-  local tmp_lines=os.tmpname()
-  local tmp_cols=os.tmpname()
-  os.execute("tput lines > " .. tmp_lines)
-  os.execute("tput cols > " .. tmp_cols)
-  local h = tonumber(io.lines(tmp_lines)())
-  local w = tonumber(io.lines(tmp_cols)())
-  os.remove(tmp_lines)
-  os.remove(tmp_cols)
+  local w, h = kb.get_console_size()
 
   display.height = h
   display.width = w
