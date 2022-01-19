@@ -22,11 +22,16 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
+#include <stdio.h>
+#include <sys/ioctl.h>
+
 int getch_wrapper(lua_State *L);
+int get_console_size(lua_State *L);
 
 int luaopen_kb(lua_State *L){
     luaL_Reg fns[] = {
         {"getch", getch_wrapper},
+        {"get_console_size", get_console_size},
         {NULL, NULL}
     };
 
@@ -42,7 +47,19 @@ int luaopen_kb(lua_State *L){
     return 0;
 }
 
-int getch_wrapper(lua_State *L){
+int get_console_size(lua_State *L)
+{
+    struct winsize max;
+    ioctl(0, TIOCGWINSZ , &max);
+
+    lua_pushnumber(L, max.ws_col);
+    lua_pushnumber(L, max.ws_row);
+
+    return 2;
+}
+
+int getch_wrapper(lua_State *L)
+{
     reset_prog_mode(); /* Get back into curses */
     lua_pushnumber(L, getch()); /* Grab a char and push it */
     endwin(); /* Get out of curses again */
