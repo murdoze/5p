@@ -24,10 +24,12 @@ local nonnull = require'nonnull'
 local serpent = require'serpent'
 local pp = function(_) print(serpent.block(_, { nocode = true, sortkeys = true, comment = false })) end
 
-local kb = require'kb'
-local inkey = function() return kb.getch() end
+local console = require'kb'
+local inkey = console.getch
 
 local display = require'display'
+
+local colors = require'colors'
 
 local genid = require'genid'
 local data = require'data'
@@ -300,7 +302,7 @@ local function show_keystatus()
 end
 
 local function show_related(items)
-  if items == nil then return "" end
+  if items == nil or #items == 0 then return "" end
 
   local s = "["
 
@@ -357,12 +359,21 @@ local function show_items(title, items)
           .. show_related(it.related.labels.items) 
           .. show_related(it.related.drones.items) 
           .. show_related(it.related.customers.items) 
-          .. show_related(it.related.milestones.items) 
+          .. show_related(it.related.milestones.items)
+
+	if related ~= "" then related = related .. " " end  
       end
 
-      display.print_line(" " .. cursor .. selected .. " " .. hl.Yellow() .. string.format("%6d", i) .. hl.Off() .. ". " .. hl.align(nonnull.value(it.name, '?'), 20) .. " " 
+      local color = ""
+      if it.color and it.color.items and it.color.items[1] then
+        color = it.color.items[1].name
+      end
+
+      display.print_line(" " 
+        .. cursor .. selected .. " " .. hl.Yellow() .. string.format("%6d", i) .. hl.Off() .. ". " 
+	.. hl.align(nonnull.value(it.name, '?'), 20) .. " " 
         .. hl.Bold() .. related .. hl.Off()
-        .. hl.Faint() .. nonnull.value(it.text, ''))
+        .. hl.Faint() .. color .. nonnull.value(it.text, ''))
 
       lines = lines - 1
       if lines <= 0 then break end
@@ -719,6 +730,19 @@ local function return_to_prev_view()
   end
 end
 
+-- Coloring
+
+local function color_item()
+  local item = get_current_item()
+  if item == nil then return end
+
+  if not item.color then
+    item.color = { items = { id = '' } }
+  end
+
+  select{ title = ' Select color ', items = colors.items, multiselect = false, selected = item.color }
+end
+
 -- Enter key multimodal handler (could do better)
 
 local function handle_enter()
@@ -801,6 +825,8 @@ make_chord(' ', function() choose_items() end, 'Choose item(s)')
 make_chord('sp', function() select_person() end, 'Select person')
 make_chord('sc', function() select_customer() end, 'Select customer')
 make_chord('sd', function() select_drone() end, 'Select drone')
+make_chord('--------------------------------------------')
+make_chord('C', function() color_item() end, 'Color current item')
 
 -- ------------------------------------------------------------------------------------------------------------------------
 
