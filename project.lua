@@ -809,7 +809,7 @@ make_chord('sd', function() select_drone() end, 'Select drone')
 local function parse_cmdline(args)
   local param = ''
 
-  for _, opt in pairs(args) do
+  for _, opt in ipairs(args) do
     pp(opt)
     if param == '' then 
       param = opt
