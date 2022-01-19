@@ -22,16 +22,34 @@
 
 #include <conio.h>
 
+#include <windows.h>
+
 int getch_wrapper(lua_State *L);
+int get_console_size(lus_State *L);
 
 int luaopen_kb(lua_State *L){
     luaL_Reg fns[] = {
         {"getch", getch_wrapper},
+        {"get_console_size", getch_wrapper},
         {NULL, NULL}
     };
 
     luaL_openlib(L, "kb", fns, 0);
 
+    return 0;
+}
+
+int get_console_size(lus_State *L) 
+{
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    int columns, rows;
+
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+    columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+    rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+
+    lua_pushnumber(L, columns);
+    lua_pushnumber(L, rows);
     return 0;
 }
 
