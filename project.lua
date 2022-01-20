@@ -1,5 +1,4 @@
 -- OS-dependent logic
-
 is_windows = false
 
 if jit and jit.os then
@@ -369,11 +368,27 @@ local function show_items(title, items)
         color = it.color.items[1].name
       end
 
-      display.print_line(" " 
-        .. cursor .. selected .. " " .. hl.Yellow() .. string.format("%6d", i) .. hl.Off() .. ". " 
-	.. hl.align(nonnull.value(it.name, '?'), 20) .. " " 
-        .. hl.Bold() .. related .. hl.Off()
-        .. hl.Faint() .. color .. nonnull.value(it.text, ''))
+      local s = " "
+
+      s = s .. cursor .. selected .. " " .. hl.Yellow() .. string.format("%6d", i) .. hl.Off() .. ". " 
+      if display.view.hide_name then
+      else
+        if display.view.color_name then
+	  s = s .. hl.align(color .. (it.name or '?') .. hl.Off(), 20)
+	else
+          s = s .. hl.align(it.name or '?', 20)
+	end
+	s = s .. hl.Off() .. " " 
+      end	
+      s = s .. hl.Bold() .. related .. hl.Off()
+      if display.view.color_text then
+        s = s .. color
+      else
+        s = s .. hl.Faint()
+      end
+      s = s .. (it.text or '') .. hl.Off()
+
+      display.print_line(s)
 
       lines = lines - 1
       if lines <= 0 then break end
@@ -470,12 +485,19 @@ local chords_list_view =
   update = function(self) self.items = filter(chords, function(it) return string.sub(it.name, 1, 1) == 'l' end) end 
 }
 
+local select_list_view = 
+{
+  title = " Select: ",
+  update = function(self) self.items = filter(chords, function(it) return string.sub(it.name, 1, 1) == 's' end) end 
+}
+
 local people_view = 
 {
   title = ' People ',
   items = nil,
   start = 1,
   cursor = 1,
+  color_name = true,
   update = function(self) self.items = data.people end
 }
 
@@ -485,6 +507,7 @@ local tasks_view =
   items = nil,
   start = 1,
   cursor = 1,
+  hide_name = true,
   update = function(self) self.items = data.tasks end
 }
 
@@ -494,6 +517,7 @@ local customers_view =
   items = nil,
   start = 1,
   cursor = 1,
+  color_name = true,
   update = function(self) self.items = data.customers end
 }
 
@@ -503,6 +527,7 @@ local milestones_view =
   items = nil,
   start = 1,
   cursor = 1,
+  color_name = true,
   update = function(self) self.items = data.milestones end
 }
 
@@ -512,6 +537,7 @@ local drones_view =
   items = nil,
   start = 1,
   cursor = 1,
+  color_name = true,
   update = function(self) self.items = data.drones end
 }
 
@@ -522,6 +548,7 @@ local labels_view =
   items = nil,
   start = 1,
   cursor = 1,
+  color_name = true,
   update = function(self) self.items = data.labels end
 }
 
@@ -626,7 +653,11 @@ local function insert_item(offset)
   it.name = ''
   it.text = ''
 
-  table.insert(display.view.items, cursor + offset, it)
+  cursor = cursor + offset
+
+  table.insert(display.view.items, cursor, it)
+
+  display.view.cursor = cursor
 end
 
 local function paste_item()
@@ -697,13 +728,15 @@ local function select_person()
 end
 
 local function select_customer()
-  local item = get_current_item()
+  local item = get_current_item_and_related()
   if item == nil then return end
+
+  local selected = item.related.customers
 
   local t = display.view.items.type
 
   if t == data.Type.Task then
-    select{ title = nil, items = data.customers, multiselect = true, selected = item.customers }
+    select{ title = nil, items = data.customers, multiselect = true, selected = selected }
   end
 
   if t == data.Type.Task then
@@ -716,10 +749,21 @@ local function select_customer()
 end
 
 local function select_drone()
-  local item = get_current_item()
+  local item = get_current_item_and_related()
   if item == nil then return end
 
-  select{ title = ' Select drones ', items = data.drones, multiselect = true, selected = {} }
+  local selected = item.related.drones
+
+  select{ title = ' Select drones ', items = data.drones, multiselect = true, selected = selected }
+end
+
+local function select_label()
+  local item = get_current_item_and_related()
+  if item == nil then return end
+
+  local selected = item.related.labels
+
+  select{ title = ' Select labels ', items = data.labels, multiselect = true, selected = selected }
 end
 
 local function return_to_prev_view()
@@ -787,6 +831,8 @@ make_chord('<^H>', function() set_current_screen(function() show_items("Chords",
 make_chord('--------------------------------------------')
 make_chord('q', nil, "Quit", true)
 make_chord('qq', save_and_quit, "Save and quit")
+make_chord('Z', nil, "Save and quit...", true)
+make_chord('ZZ', save_and_quit, "...Vim style")
 make_chord('q!', quit_no_save, "Quit without saving")
 make_chord('<^S>', save_data, "Save data")
 make_chord('<^O>', load_data, "Load data")
@@ -807,7 +853,8 @@ make_chord('<END>', function() scroll{ to = #display.view.items } end, 'Last ite
 make_chord('--------------------------------------------')
 make_chord('i', function() insert_item(0) end, 'Insert item above')
 make_chord('A', function() insert_item(1) end, 'Insert item below')
-make_chord('d', function() delete_current_item() end, 'Delete current item')
+make_chord('d', nil, 'Delete...')
+make_chord('dd', function() delete_current_item() end, 'Delete current item')
 make_chord('p', function() paste_item() end, 'Paste item')
 make_chord('--------------------------------------------')
 make_chord('e', function() end, 'Edit', true)
@@ -820,11 +867,12 @@ make_chord('<ENTER>', function() handle_enter() end, 'Do search! / Accept select
 make_chord('<ESC>', function() handle_escape() end, 'Accept selection via escape')
 make_chord('g', function() if input.last_number ~= 0 then current_chord = ''; scroll{ to = input.last_number }; input.number = 0; input.last_number = 0; end end, 'Go to...', true)
 make_chord('--------------------------------------------')
-make_chord('s', function() end, 'Select', true)
 make_chord(' ', function() choose_items() end, 'Choose item(s)')
+make_chord('s', function() end, 'Select', true)
 make_chord('sp', function() select_person() end, 'Select person')
 make_chord('sc', function() select_customer() end, 'Select customer')
 make_chord('sd', function() select_drone() end, 'Select drone')
+make_chord('sl', function() select_label() end, 'Select label')
 make_chord('--------------------------------------------')
 make_chord('C', function() color_item() end, 'Color current item')
 
