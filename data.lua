@@ -45,6 +45,7 @@ local tasks =
     drones =
     {
       multiple = true,
+      items = {}
     },
     customers =
     {
