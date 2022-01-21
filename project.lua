@@ -676,11 +676,14 @@ end
 -- Selecting items
 
 local function select(args)
-  -- local title = nonnull.value(args.title, ' Select: ')
   local title = args.title or ' Select: '
   local items = args.items
   local multiselect = nonnull.value(args.multiselect, false)
   local selected = args.selected
+
+  local hide_name = args.hide_name
+  local color_name = args.color_name
+  local color_text = args.color_text
 
   display.prev_view = display.view
 
@@ -692,6 +695,9 @@ local function select(args)
     cursor = 1,
     selecting = true,
     multiselect = multiselect,
+    hide_name = hide_name,
+    color_name = color_name or true,
+    color_text = color_text,
     selected = selected,
   }
   set_current_screen(function() show_view(view) end)
@@ -784,7 +790,7 @@ local function color_item()
     item.color = { items = { id = '' } }
   end
 
-  select{ title = ' Select color ', items = colors.items, multiselect = false, selected = item.color }
+  select{ title = ' Select color ', items = colors.items, multiselect = false, selected = item.color, hide_name = false, color_text = true }
 end
 
 -- Enter key multimodal handler (could do better)
@@ -875,6 +881,7 @@ make_chord('sd', function() select_drone() end, 'Select drone')
 make_chord('sl', function() select_label() end, 'Select label')
 make_chord('--------------------------------------------')
 make_chord('C', function() color_item() end, 'Color current item')
+make_chord('<^C>', function() set_current_screen(function() hl.printColorTable() end) end, 'Print color table')
 
 -- ------------------------------------------------------------------------------------------------------------------------
 
