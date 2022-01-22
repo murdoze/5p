@@ -99,6 +99,13 @@ local project = {}
 
 project.dir = "." .. path_separator
 
+local function add_to_index(items)
+  for _, it in ipairs(items) do
+    local id = it.id
+    index[id] = it
+  end
+end
+
 local function load_data()
   local dirf, err = io.open(project.dir)
   if not dirf then
@@ -120,6 +127,14 @@ local function load_data()
   data.milestones = new_data.milestones or data.milestones
   data.drones = new_data.drones or data.drones
   data.labels = new_data.labels or data.labels
+
+  index = {} -- Loaded new data , clean the index
+  add_to_index(data.people)
+  add_to_index(data.tasks)
+  add_to_index(data.customers)
+  add_to_index(data.milestones)
+  add_to_index(data.drones)
+  add_to_index(data.labels)
 
   status_text = "Loaded project data from " .. project.dir
 end
