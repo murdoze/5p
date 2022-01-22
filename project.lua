@@ -799,7 +799,7 @@ end
 
 --- Colors
 
-local function make_hl(args)
+local function make_color_hl(args)
   local s = ''
 
   if args.bold then s = s .. hl.Bold() end
@@ -823,6 +823,36 @@ local function make_hl(args)
   return s
 end
 
+local function make_color_text(args)
+  local s = ''
+
+  local color_names =
+  {
+    'Black', 'Red', 'Green', 'Yellow', 'Blue', 'Magenta', 'Cyan', 'White'
+  }
+
+  if args.bold then s = s .. "Bold " end
+
+  if args.fg_color then
+    if args.fg_bright then
+      s = s .. 'Bright '
+    end
+    s = s .. color_names[args.fg_color + 1]
+  end
+
+  if args.bg_color then
+    if s ~= '' then s = s .. ' on ' end
+
+    if args.bg_bright then
+      s = s .. 'Bright '
+    end
+    s = s .. color_names[args.bg_color + 1]
+    s = s .. ' Background'
+  end
+
+  return s
+end
+
 local function change_current_color(args)
   local color = get_current_item()
   if color == nil then return end
@@ -837,6 +867,7 @@ local function change_current_color(args)
       color.bg_color = args.bg_color
     end
     if args.bg_color == -1 then
+      if not color.bg_color then color.bg_color = 0 end
       color.bg_color = (color.bg_color + 1) % 8
     end
   end
@@ -846,6 +877,7 @@ local function change_current_color(args)
       color.fg_color = args.fg_color
     end
     if args.fg_color == -1 then
+      if not color.fg_color then color.fg_color = 0 end
       color.fg_color = (color.fg_color + 1) % 8
     end
   end
@@ -853,10 +885,14 @@ local function change_current_color(args)
   color.bg_bright = args.bg_bright
   color.fg_bright = args.fg_bright
 
-  local s = make_hl{ bold = color.bold, fg_color = color.fg_color, bg_color = color.bg_color, fg_bright = color.fg_bright, bg_bright = color.bg_bright }
+  local color_def = { bold = color.bold, fg_color = color.fg_color, bg_color = color.bg_color, fg_bright = color.fg_bright, bg_bright = color.bg_bright }
 
-  color.name = s
-  color.color = { items = { { name = s } } }
+  local color_hl = make_color_hl(color_def)
+  local color_text = make_color_text(color_def)
+
+  color.name = color_hl
+  color.text = color_text
+  color.color = { items = { { name = color_hl } } }
 end
 
 local colors_view =
