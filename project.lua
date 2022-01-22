@@ -309,9 +309,25 @@ local function show_related(items)
 
   local s = "["
 
-  for i, it in ipairs(items) do
+  for i, item in ipairs(items) do
     if i > 1 then s = s .. "|" end
-    s = s .. it.name
+
+    local has_color = false
+    local it = index[item.id]
+    if it ~= nil then
+      local color = ""
+      if it.color and it.color.items and it.color.items[1] then
+        color = it.color.items[1].name
+	s = s .. color
+	has_color = true
+      end
+    end
+
+    s = s .. item.name
+
+    if has_color then
+      s = s .. hl.Off()
+    end
   end
 
   s = s .. "]"
@@ -651,30 +667,34 @@ local function insert_item(offset)
   local cursor = display.view.cursor
   if cursor == nil then return nil end
   if cursor == 0 then offset = 1 end
+  
+  cursor = cursor + offset
+  display.view.cursor = cursor
 
+  local id = genid()
   local it = {}
-  it.id = genid()
+
+  it.id = id
   it.name = ''
   it.text = ''
 
-  cursor = cursor + offset
-
   table.insert(display.view.items, cursor, it)
-
-  display.view.cursor = cursor
+  index[id] = it
 end
 
 local function paste_item()
   local cursor = display.view.cursor
   if cursor == nil then return nil end
 
+  local id = genid()
   local it = {}
-  it.id = genid()
+  it.id = id
   it.name = yanked_item.name
   it.text = yanked_item.text
   it.related = copy(yanked_item.related)
 
   table.insert(display.view.items, cursor, it)
+  index[id] = it
 end
 
 -- Selecting items
