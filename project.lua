@@ -18,7 +18,6 @@ package.path='./lib/?.lua;'..package.path
 -- Imports
 
 local hl = require'highlight'
-local nonnull = require'nonnull'
 
 local serpent = require'serpent'
 local pp = function(_) print(serpent.block(_, { nocode = true, sortkeys = true, comment = false })) end
@@ -115,12 +114,12 @@ local function load_data()
     return
   end
  
-  data.people = nonnull.value(new_data.people, data.people)
-  data.tasks = nonnull.value(new_data.tasks, data.tasks)
-  data.customers = nonnull.value(new_data.customers, data.customers)
-  data.milestones = nonnull.value(new_data.milestones, data.milestones)
-  data.drones = nonnull.value(new_data.drones, data.drones)
-  data.labels = nonnull.value(new_data.labels, data.labels)
+  data.people = new_data.people or data.people
+  data.tasks = new_data.tasks or data.tasks
+  data.customers = new_data.customers or data.customers
+  data.milestones = new_data.milestones or data.milestones
+  data.drones = new_data.drones or data.drones
+  data.labels = new_data.labels or data.labels
 
   status_text = "Loaded project data from " .. project.dir
 end
@@ -340,8 +339,8 @@ local function show_items(title, items)
   display.print("(" .. tostring(#items) .. ")")
 
   display.view.items = items
-  items = nonnull.list(items)
-  display.view.start = nonnull.value(display.view.start, 1)
+  items = items or {}
+  display.view.start = display.view.start or 1
 
   local lines = display.list_count
 
@@ -645,7 +644,7 @@ end
 local function edit_current_item(field)
   local it = get_current_item()
   if it ~= nil then
-    it[field] = edit_in_vim(nonnull.value(it[field], '')) 
+    it[field] = edit_in_vim(it[field] or '')
   end
 end
 
@@ -702,7 +701,7 @@ end
 local function select(args)
   local title = args.title or ' Select: '
   local items = args.items
-  local multiselect = nonnull.value(args.multiselect, false)
+  local multiselect = args.multiselect or false
   local selected = args.selected
 
   local hide_name = args.hide_name
@@ -729,7 +728,7 @@ end
 
 local function choose_items()
   local view = display.view
-  if nonnull.value(view.selecting, false) then
+  if view.selecting then
     local item = view.items[view.cursor]
     if view.multiselect then
       local exists = false
@@ -798,7 +797,7 @@ end
 
 local function return_to_prev_view()
   if display.prev_view ~= nil then
-    if nonnull.value(display.view.selecting, false) then
+    if display.view.selecting then
       set_current_screen(function() show_view(display.prev_view) end)
     end
   end
