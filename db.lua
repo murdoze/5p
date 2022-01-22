@@ -1,7 +1,13 @@
 -- Data Model
 local genid = require'genid'
 
+local db = {}
+
 local data = {}
+local index = {}
+
+db.data = data
+db.index = index
 
 local Type = 
 {
@@ -179,4 +185,4 @@ end
 
 ]]--
 
-return data
+return db

@@ -44,7 +44,6 @@ set printoptions=paper:a4
 set ruler
 set runtimepath=~/.vim,~/.vim/pack/plug/start/rtags,~/.vim/pack/plug/start/q,~/.vim/pack/plug/start/lua-support,~/.vim/pack/git-plugins/start/vim-which-key,/var/lib/vim/addons,/etc/vim,/usr/share/vim/vimfiles,/usr/share/vim/vim82,/usr/share/vim/vimfiles/after,/etc/vim/after,/var/lib/vim/addons/after,~/.vim/after
 set suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,.toc
-set window=59
 let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1
 let v:this_session=expand("<sfile>:p")
 silent only
@@ -352,7 +351,7 @@ normal! zt
 keepjumps 1
 normal! 0
 tabnext
-edit data.lua
+edit db.lua
 set splitbelow splitright
 set nosplitbelow
 set nosplitright
@@ -362,8 +361,8 @@ set winheight=1
 set winminwidth=0
 set winwidth=1
 argglobal
-3argu
-balt project.lua
+if bufexists("db.lua") | buffer db.lua | else | edit db.lua | endif
+balt db.lua
 setlocal keymap=
 setlocal noarabic
 setlocal autoindent
@@ -506,6 +505,7 @@ set winheight=1
 set winminwidth=0
 set winwidth=1
 argglobal
+1argu
 if bufexists("colors.lua") | buffer colors.lua | else | edit colors.lua | endif
 balt colors.lua
 setlocal keymap=
@@ -777,7 +777,7 @@ setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 1 - ((0 * winheight(0) + 30) / 60)
+let s:l = 1 - ((0 * winheight(0) + 29) / 58)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
@@ -789,7 +789,8 @@ badd +0 project.lua
 badd +1 display.lua
 badd +1 data.lua
 badd +1 serdes.lua
-badd +0 colors.lua
+badd +1 colors.lua
+badd +0 db.lua
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0
   silent exe 'bwipe ' . s:wipebuf
 endif

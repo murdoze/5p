@@ -31,7 +31,11 @@ local display = require'display'
 local colors = require'colors'
 
 local genid = require'genid'
-local data = require'data'
+
+local db = require'db'
+local data = db.data
+local index = db.index
+
 local serdes = require'serdes'
 
 require'noglobals'
