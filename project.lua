@@ -165,11 +165,12 @@ local last_chord = ''
 
 local chords = {}
 
-local function make_chord(chord, func, text, continue_chord)
-  local ch = { func =  func, name = chord, text = text, continue = continue_chord }
+local function make_chord(args)
+  local chords = args.chords or chords
+  local ch = { func =  args.func, name = args.chord or '', text = args.text, continue = args.continue }
 
   table.insert(chords, ch)
-  chords[chord] = ch
+  if args.chord then chords[args.chord] = ch end
 end
 
 local function chars_for(key)
@@ -870,58 +871,60 @@ end
 
 -- Chords
 
-make_chord('?', function() set_current_screen(function() show_view(chords_view) end) end, "Show chords help")
-make_chord('<^H>', function() set_current_screen(function() show_items("Chords", chords) end) end, "Show chords help")
-make_chord('--------------------------------------------')
-make_chord('q', nil, "Quit", true)
-make_chord('qq', save_and_quit, "Save and quit")
-make_chord('<^Q>', save_and_quit, "Save and quit")
-make_chord('Z', nil, "Save and quit...", true)
-make_chord('ZZ', save_and_quit, "...Vim style")
-make_chord('q!', quit_no_save, "Quit without saving")
-make_chord('<^S>', save_data, "Save data")
-make_chord('<^O>', load_data, "Load data")
-make_chord('--------------------------------------------')
-make_chord('l', function() set_current_screen(function() show_view(chords_list_view) end) end, "List", true)
-make_chord('lp', function() set_current_screen(function() show_view(people_view) end) end, "List people")
-make_chord('lt', function() set_current_screen(function() show_view(tasks_view) end) end, "List tasks")
-make_chord('lc', function() set_current_screen(function() show_view(customers_view) end) end, "List customers")
-make_chord('lm', function() set_current_screen(function() show_view(milestones_view) end) end, "List milestones")
-make_chord('ld', function() set_current_screen(function() show_view(drones_view) end) end, "List drones")
-make_chord('ll', function() set_current_screen(function() show_view(labels_view) end) end, "List labels")
-make_chord('<DOWN>', function() scroll{ by = 1 } end, 'Scroll up')
-make_chord('<UP>', function() scroll{ by = -1 } end, 'Scroll down')
-make_chord('<PGDOWN>', function() scroll{ by = display.list_count } end, 'Scroll page up')
-make_chord('<PGUP>', function() scroll{ by = -display.list_count } end, 'Scroll page down')
-make_chord('<HOME>', function() scroll{ to = 1 } end, 'First item')
-make_chord('<END>', function() scroll{ to = #display.view.items } end, 'Last item')
-make_chord('--------------------------------------------')
-make_chord('i', function() insert_item(0) end, 'Insert item above')
-make_chord('A', function() insert_item(1) end, 'Insert item below')
-make_chord('d', nil, 'Delete...', true)
-make_chord('dd', function() delete_current_item() end, 'Delete current item')
-make_chord('p', function() paste_item() end, 'Paste item')
-make_chord('--------------------------------------------')
-make_chord('e', function() end, 'Edit', true)
-make_chord('ea', function() edit_all_in_vim() end, 'Edit all in Vim')
-make_chord('en', function() edit_current_item'name' end, 'Edit name in Vim')
-make_chord('et', function() edit_current_item'text' end, 'Edit text in Vim')
-make_chord('E', function() edit_current_item'text' end, 'Edit text in Vim')
-make_chord('--------------------------------------------')
-make_chord('/', function() input.in_search = true; input.search_str = '' end, 'Search')
-make_chord('<ENTER>', function() handle_enter() end, 'Do search! / Accept selection')
-make_chord('<ESC>', function() handle_escape() end, 'Accept selection via escape')
-make_chord('g', function() if input.last_number ~= 0 then current_chord = ''; scroll{ to = input.last_number }; input.number = 0; input.last_number = 0; end end, 'Go to...', true)
-make_chord('--------------------------------------------')
-make_chord(' ', function() choose_items() end, 'Choose item(s)')
-make_chord('s', function() end, 'Select', true)
-make_chord('sp', function() select_person() end, 'Select person')
-make_chord('sc', function() select_customer() end, 'Select customer')
-make_chord('sd', function() select_drone() end, 'Select drone')
-make_chord('sl', function() select_label() end, 'Select label')
-make_chord('--------------------------------------------')
-make_chord('C', function() color_item() end, 'Color current item')
-make_chord('<^C>', function() set_current_screen(function() hl.printColorTable() end) end, 'Print color table')
+--  local ch = { func =  args.func, name = args.chord, text = args.text, continue = args.continue_chord }
+
+make_chord{chord = '?', func = function() set_current_screen(function() show_view(chords_view) end) end, text = "Show chords help"}
+make_chord{chord = '<^H>', func = function() set_current_screen(function() show_items("Chords", chords) end) end, text = "Show chords help"}
+make_chord{text = '--------------------------------------------'}
+make_chord{chord = 'q', func = nil, text = "Quit", continue = true}
+make_chord{chord = 'qq', func = save_and_quit, text = "Save and quit"}
+make_chord{chord = '<^Q>', func = save_and_quit, text = "Save and quit"}
+make_chord{chord = 'Z', func = nil, text = "Save and quit...", true}
+make_chord{chord = 'ZZ', func = save_and_quit, text = "...Vim style"}
+make_chord{chord = 'q!', func = quit_no_save, text = "Quit without saving"}
+make_chord{chord = '<^S>', func = save_data, text = "Save data"}
+make_chord{chord = '<^O>', func = load_data, text = "Load data"}
+make_chord{text = '--------------------------------------------'}
+make_chord{chord = 'l', func = function() set_current_screen(function() show_view(chords_list_view) end) end, text = "List", continue = true}
+make_chord{chord = 'lp', func = function() set_current_screen(function() show_view(people_view) end) end, text = "List people"}
+make_chord{chord = 'lt', func = function() set_current_screen(function() show_view(tasks_view) end) end, text = "List tasks"}
+make_chord{chord = 'lc', func = function() set_current_screen(function() show_view(customers_view) end) end, text = "List customers"}
+make_chord{chord = 'lm', func = function() set_current_screen(function() show_view(milestones_view) end) end, text = "List milestones"}
+make_chord{chord = 'ld', func = function() set_current_screen(function() show_view(drones_view) end) end, text = "List drones"}
+make_chord{chord = 'll', func = function() set_current_screen(function() show_view(labels_view) end) end, text = "List labels"}
+make_chord{chord = '<DOWN>', func = function() scroll{ by = 1 } end, text = 'Scroll up'}
+make_chord{chord = '<UP>', func = function() scroll{ by = -1 } end, text = 'Scroll down'}
+make_chord{chord = '<PGDOWN>', func = function() scroll{ by = display.list_count } end, text = 'Scroll page up'}
+make_chord{chord = '<PGUP>', func = function() scroll{ by = -display.list_count } end, text = 'Scroll page down'}
+make_chord{chord = '<HOME>', func = function() scroll{ to = 1 } end, text = 'First item'}
+make_chord{chord = '<END>', func = function() scroll{ to = #display.view.items } end, text = 'Last item'}
+make_chord{text = '--------------------------------------------'}
+make_chord{chord = 'i', func = function() insert_item(0) end, text = 'Insert item above'}
+make_chord{chord = 'A', func = function() insert_item(1) end, text = 'Insert item below'}
+make_chord{chord = 'd', func = nil, text = 'Delete...', true}
+make_chord{chord = 'dd', func = function() delete_current_item() end, text = 'Delete current item'}
+make_chord{chord = 'p', func = function() paste_item() end, text = 'Paste item'}
+make_chord{text = '--------------------------------------------'}
+make_chord{chord = 'e', func = function() end, text = 'Edit', continue = true}
+make_chord{chord = 'ea', func = function() edit_all_in_vim() end, text = 'Edit all in Vim'}
+make_chord{chord = 'en', func = function() edit_current_item'name' end, text = 'Edit name in Vim'}
+make_chord{chord = 'et', func = function() edit_current_item'text' end, text = 'Edit text in Vim'}
+make_chord{chord = 'E', func = function() edit_current_item'text' end, text = 'Edit text in Vim'}
+make_chord{text = '--------------------------------------------'}
+make_chord{chord = '/', func = function() input.in_search = true; input.search_str = '' end, text = 'Search'}
+make_chord{chord = '<ENTER>', func = function() handle_enter() end, text = 'Do search! / Accept selection'}
+make_chord{chord = '<ESC>', func = function() handle_escape() end, text = 'Accept selection via escape'}
+make_chord{chord = 'g', func = function() if input.last_number ~= 0 then current_chord = ''; scroll{ to = input.last_number }; input.number = 0; input.last_number = 0; end end, text = 'Go to...', true}
+make_chord{text = '--------------------------------------------'}
+make_chord{chord = ' ', func = function() choose_items() end, text = 'Choose item(s)'}
+make_chord{chord = 's', func = function() end, text = 'Select', continue = true}
+make_chord{chord = 'sp', func = function() select_person() end, text = 'Select person'}
+make_chord{chord = 'sc', func = function() select_customer() end, text = 'Select customer'}
+make_chord{chord = 'sd', func = function() select_drone() end, text = 'Select drone'}
+make_chord{chord = 'sl', func = function() select_label() end, text = 'Select label'}
+make_chord{text = '--------------------------------------------'}
+make_chord{chord = 'C', func = function() color_item() end, text = 'Color current item'}
+make_chord{chord = '<^C>', func = function() set_current_screen(function() hl.printColorTable() end) end, text = 'Print color table'}
 
 -- ------------------------------------------------------------------------------------------------------------------------
 
