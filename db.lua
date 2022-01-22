@@ -17,7 +17,7 @@ local Type =
   Milestone = 'MILESTONE',
   Drone = 'DRONE',
   Label = 'LABEL',
-
+  Color = 'COLOR',
 }
 
 local people = 
@@ -123,6 +123,14 @@ local labels =
   }
 }
 
+local colors = 
+{ 
+  type = Type.Color,
+  related =
+  {
+  }
+}
+
 data.Type = Type
 
 data.people = people
@@ -131,5 +139,6 @@ data.customers = customers
 data.milestones = milestones
 data.drones = drones
 data.labels = labels
+data.colors = colors
 
 return db

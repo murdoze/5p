@@ -18,6 +18,7 @@ local customers_filename = 'Customers.lua'
 local milestones_filename = 'Milestones.lua'
 local drones_filename = 'Drones.lua'
 local labels_filename = 'Labels.lua'
+local colors_filename = 'Colors.lua'
 
 local all_filenames = 
 {
@@ -27,6 +28,7 @@ customers_filename,
 milestones_filename,
 drones_filename,
 labels_file_name,
+colors_file_name,
 }
 
 -- Editing in Vim
@@ -81,7 +83,7 @@ end
 
 local function load_dir(dir)
   local res = true
-  local people, tasks, customers, milestones, drones, labels
+  local people, tasks, customers, milestones, drones, labels, colors
 
   res, people = load_file(dir .. people_filename)
   if not res then people = nil end
@@ -101,6 +103,9 @@ local function load_dir(dir)
   res, labels = load_file(dir .. labels_filename)
   if not res then labels = nil end
 
+  res, colors = load_file(dir .. colors_filename)
+  if not res then colors = nil end
+
   local data = {}
   data.people = people
   data.tasks = tasks
@@ -108,6 +113,7 @@ local function load_dir(dir)
   data.milestones = milestones
   data.drones = drones
   data.labels = labels
+  data.colors = colors 
 
   return true, data
 end
@@ -131,6 +137,9 @@ local function save_dir(dir, data)
   if not res then return res, err end
 
   res, err = save_file(dir .. labels_filename, data.labels)
+  if not res then return res, err end
+
+  res, err = save_file(dir .. colors_filename, data.colors)
   if not res then return res, err end
 
   return true

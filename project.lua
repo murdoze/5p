@@ -27,7 +27,6 @@ local inkey = console.getch
 
 local display = require'display'
 
-local colors = require'colors'
 
 local genid = require'genid'
 
@@ -127,6 +126,7 @@ local function load_data()
   data.milestones = new_data.milestones or data.milestones
   data.drones = new_data.drones or data.drones
   data.labels = new_data.labels or data.labels
+  data.colors = new_data.colors or data.colors
 
   index = {} -- Loaded new data , clean the index
   add_to_index(data.people)
@@ -135,6 +135,7 @@ local function load_data()
   add_to_index(data.milestones)
   add_to_index(data.drones)
   add_to_index(data.labels)
+  add_to_index(data.colors)
 
   status_text = "Loaded project data from " .. project.dir
 end
@@ -157,8 +158,8 @@ local input = {}
 input.in_search = false
 input.search_str = ''
 
-input.number = 0
-input.last_number = 0
+input.number = -1
+input.last_number = -1
 
 local current_chord = ''
 local last_chord = ''
@@ -173,6 +174,9 @@ local function make_chord(args)
   if args.chord then chords[args.chord] = ch end
 end
 
+
+-- BEWARE!!! This function has side effects
+-- TODO:     Get rid of sid effects
 local function chars_for(key)
   if input.in_search then
     if key ~= 10 then
@@ -188,6 +192,7 @@ local function chars_for(key)
   end
 
   if key >= string.byte('0') and key <= string.byte('9') then
+    if input.number == -1 then input.number = 0 end
     input.number = input.number * 10 + (key - string.byte('0'))
     return ''
   end
@@ -234,14 +239,17 @@ local function chars_for(key)
   return cmd
 end
 
-local function chord_for(key)
-  local chars = chars_for(key)
+-- BEWARE!!! This function has side effects
+--           It can be called only once per a key pressed
+local function chord_for(chars, chords, chords2)
   if chars == '' then return nil end
-
 
   current_chord = current_chord .. chars
 
   local chord = chords[current_chord]
+  if chord == nil and chords2 then
+    chord = chords2[current_chord]
+  end
 
   if chord ~= nil then
     -- play the chord
@@ -505,89 +513,6 @@ local function filter(t, func)
   return r
 end
 
--- Views
-
-local chords_view =
-{
-  title = " Chords ",
-  items = chords,
-  update = function(self) self.items = filter(chords, function(it) return true end) end 
-}
-
-local chords_list_view = 
-{
-  title = " List: ",
-  update = function(self) self.items = filter(chords, function(it) return string.sub(it.name, 1, 1) == 'l' end) end 
-}
-
-local select_list_view = 
-{
-  title = " Select: ",
-  update = function(self) self.items = filter(chords, function(it) return string.sub(it.name, 1, 1) == 's' end) end 
-}
-
-local people_view = 
-{
-  title = ' People ',
-  items = nil,
-  start = 1,
-  cursor = 1,
-  color_name = true,
-  update = function(self) self.items = data.people end
-}
-
-local tasks_view = 
-{
-  title = ' Tasks ',
-  items = nil,
-  start = 1,
-  cursor = 1,
-  hide_name = true,
-  update = function(self) self.items = data.tasks end
-}
-
-local customers_view =
-{  
-  title = ' Customers ',
-  items = nil,
-  start = 1,
-  cursor = 1,
-  color_name = true,
-  update = function(self) self.items = data.customers end
-}
-
-local milestones_view =
-{  
-  title = ' Milestones ',
-  items = nil,
-  start = 1,
-  cursor = 1,
-  color_name = true,
-  update = function(self) self.items = data.milestones end
-}
-
-local drones_view =
-{  
-  title = ' Drones ',
-  items = nil,
-  start = 1,
-  cursor = 1,
-  color_name = true,
-  update = function(self) self.items = data.drones end
-}
-
-
-local labels_view =
-{  
-  title = ' Labels ',
-  items = nil,
-  start = 1,
-  cursor = 1,
-  color_name = true,
-  update = function(self) self.items = data.labels end
-}
-
-
 -- Edit in Vim
 
 local function edit_all_in_vim()
@@ -624,6 +549,7 @@ local function edit_in_vim(s)
 end
 
 -- Item manipulation
+
 local yanked_item = {}
 
 local function copy_item(it)
@@ -682,7 +608,7 @@ local function insert_item(offset)
   local cursor = display.view.cursor
   if cursor == nil then return nil end
   if cursor == 0 then offset = 1 end
-  
+ 
   cursor = cursor + offset
   display.view.cursor = cursor
 
@@ -829,7 +755,7 @@ local function color_item()
     item.color = { items = { id = '' } }
   end
 
-  select{ title = ' Select color ', items = colors.items, multiselect = false, selected = item.color, hide_name = false, color_text = true }
+  select{ title = ' Select color ', items = data.colors, multiselect = false, selected = item.color, hide_name = false, color_text = true }
 end
 
 -- Enter key multimodal handler (could do better)
@@ -869,9 +795,163 @@ local function quit_no_save()
   quit()
 end
 
--- Chords
+-- Views
 
---  local ch = { func =  args.func, name = args.chord, text = args.text, continue = args.continue_chord }
+--- Colors
+
+local function make_hl(args)
+  local s = ''
+
+  if args.bold then s = s .. hl.Bold() end
+
+  if args.fg_color then
+    if args.fg_bright then
+      s = s .. hl.BrightColor(args.fg_color)()
+    else
+      s = s .. hl.Color(args.fg_color)()
+    end
+  end
+
+  if args.bg_color then
+    if args.bg_bright then
+      s = s .. hl.BrightBgColor(args.bg_color)()
+    else
+      s = s .. hl.BgColor(args.bg_color)()
+    end
+  end
+
+  return s
+end
+
+local function change_current_color(args)
+  local color = get_current_item()
+  if color == nil then return end
+
+  args.bg_bright = args.bg_bright or false
+  args.fg_bright = args.fg_bright or false
+
+  if args.toggle_bold then color.bold = not color.bold end
+  if args.bg_color and args.bg_color >= 0 and args.bg_color <= 7 then color.bg_color = args.bg_color end
+  if args.fg_color and args.fg_color >= 0 and args.fg_color <= 7 then color.fg_color = args.fg_color end
+  color.bg_bright = args.bg_bright
+  color.fg_bright = args.fg_bright
+
+  local s = make_hl{ bold = color.bold, fg_color = color.fg_color, bg_color = color.bg_color, fg_bright = color.fg_bright, bg_bright = color.bg_bright }
+
+  color.name = s
+  color.color = { items = { { name = s } } }
+end
+
+local colors_view =
+{
+  title = " Colors ",
+  items = nil,
+  start = 1,
+  cursor = 1,
+  hide_name = true,
+  color_text = true,
+  chords = {},
+  update = function(self)
+    self.items = data.colors
+  end 
+}
+make_chord{ chords = colors_view.chords, chord = 'b', text = 'Background color #', func = function() change_current_color{ bg_color = input.number; bg_bright = false }; input.number = -1 end }
+make_chord{ chords = colors_view.chords, chord = 'B', text = 'Background color # bright', func = function() change_current_color{ bg_color = input.number; bg_bright = true }; input.number = -1 end }
+make_chord{ chords = colors_view.chords, chord = 'f', text = 'Foreground color #', func = function() change_current_color{ fg_color = input.number; fg_bright = false }; input.number = -1 end }
+make_chord{ chords = colors_view.chords, chord = 'F', text = 'Foreground color # bright', func = function() change_current_color{ fg_color = input.number; fg_bright = true }; input.number = -1 end }
+make_chord{ chords = colors_view.chords, chord = 'h', text = 'Toggle bold', func = function() change_current_color{ toggle_bold = true } end }
+
+--- Chords
+
+local chords_view =
+{
+  title = " Chords ",
+  items = chords,
+  update = function(self)
+    self.items = display.view.chords or chords 
+  end 
+}
+
+local chords_list_view = 
+{
+  title = " List: ",
+  update = function(self) self.items = filter(chords, function(it) return string.sub(it.name, 1, 1) == 'l' end) end 
+}
+
+--- Select
+
+local select_list_view = 
+{
+  title = " Select: ",
+  update = function(self) self.items = filter(chords, function(it) return string.sub(it.name, 1, 1) == 's' end) end 
+}
+
+--- Items
+
+local people_view = 
+{
+  title = ' People ',
+  items = nil,
+  start = 1,
+  cursor = 1,
+  color_name = true,
+  update = function(self) self.items = data.people end
+}
+
+local tasks_view = 
+{
+  title = ' Tasks ',
+  items = nil,
+  start = 1,
+  cursor = 1,
+  hide_name = true,
+  update = function(self) self.items = data.tasks end
+}
+
+local customers_view =
+{  
+  title = ' Customers ',
+  items = nil,
+  start = 1,
+  cursor = 1,
+  color_name = true,
+  update = function(self) self.items = data.customers end
+}
+
+local milestones_view =
+{  
+  title = ' Milestones ',
+  items = nil,
+  start = 1,
+  cursor = 1,
+  color_name = true,
+  update = function(self) self.items = data.milestones end
+}
+
+local drones_view =
+{  
+  title = ' Drones ',
+  items = nil,
+  start = 1,
+  cursor = 1,
+  color_name = true,
+  update = function(self) self.items = data.drones end
+}
+
+--- Labels
+
+local labels_view =
+{  
+  title = ' Labels ',
+  items = nil,
+  start = 1,
+  cursor = 1,
+  color_name = true,
+  update = function(self) self.items = data.labels end
+}
+
+
+-- Chords
 
 make_chord{chord = '?', func = function() set_current_screen(function() show_view(chords_view) end) end, text = "Show chords help"}
 make_chord{chord = '<^H>', func = function() set_current_screen(function() show_items("Chords", chords) end) end, text = "Show chords help"}
@@ -892,6 +972,8 @@ make_chord{chord = 'lc', func = function() set_current_screen(function() show_vi
 make_chord{chord = 'lm', func = function() set_current_screen(function() show_view(milestones_view) end) end, text = "List milestones"}
 make_chord{chord = 'ld', func = function() set_current_screen(function() show_view(drones_view) end) end, text = "List drones"}
 make_chord{chord = 'll', func = function() set_current_screen(function() show_view(labels_view) end) end, text = "List labels"}
+make_chord{chord = 'lC', func = function() set_current_screen(function() show_view(colors_view) end) end, text = "List colors"}
+make_chord{text = '--------------------------------------------'}
 make_chord{chord = '<DOWN>', func = function() scroll{ by = 1 } end, text = 'Scroll up'}
 make_chord{chord = '<UP>', func = function() scroll{ by = -1 } end, text = 'Scroll down'}
 make_chord{chord = '<PGDOWN>', func = function() scroll{ by = display.list_count } end, text = 'Scroll page up'}
@@ -901,7 +983,7 @@ make_chord{chord = '<END>', func = function() scroll{ to = #display.view.items }
 make_chord{text = '--------------------------------------------'}
 make_chord{chord = 'i', func = function() insert_item(0) end, text = 'Insert item above'}
 make_chord{chord = 'A', func = function() insert_item(1) end, text = 'Insert item below'}
-make_chord{chord = 'd', func = nil, text = 'Delete...', true}
+make_chord{chord = 'd', func = nil, text = 'Delete...', continue = true}
 make_chord{chord = 'dd', func = function() delete_current_item() end, text = 'Delete current item'}
 make_chord{chord = 'p', func = function() paste_item() end, text = 'Paste item'}
 make_chord{text = '--------------------------------------------'}
@@ -914,7 +996,7 @@ make_chord{text = '--------------------------------------------'}
 make_chord{chord = '/', func = function() input.in_search = true; input.search_str = '' end, text = 'Search'}
 make_chord{chord = '<ENTER>', func = function() handle_enter() end, text = 'Do search! / Accept selection'}
 make_chord{chord = '<ESC>', func = function() handle_escape() end, text = 'Accept selection via escape'}
-make_chord{chord = 'g', func = function() if input.last_number ~= 0 then current_chord = ''; scroll{ to = input.last_number }; input.number = 0; input.last_number = 0; end end, text = 'Go to...', true}
+make_chord{chord = 'g', func = function() if input.last_number ~= -1 then current_chord = ''; scroll{ to = input.last_number }; input.number = -1; input.last_number = -1 end end, text = 'Go to item #', true}
 make_chord{text = '--------------------------------------------'}
 make_chord{chord = ' ', func = function() choose_items() end, text = 'Choose item(s)'}
 make_chord{chord = 's', func = function() end, text = 'Select', continue = true}
@@ -972,8 +1054,13 @@ do
  
     key = inkey()
     status_text = ''
-
-    chord = chord_for(key)
+    
+    local chars = chars_for(key)
+    local view_chords = nil
+    if display.view.chords then
+      view_chords = display.view.chords
+    end
+    chord = chord_for(chars, chords, view_chords)
 
     if chord ~= nil then
       local func = chord.func
@@ -985,7 +1072,7 @@ do
     end  
 
     keystatus_text = "Chord .. [" .. last_chord .. "] Key [" .. tostring(key) .. "]"
-    if input.number ~= 0 then keystatus_text = keystatus_text .. " Number [" .. tostring(input.number) .. "]" end
+    if input.number ~= -1 then keystatus_text = keystatus_text .. " Number [" .. tostring(input.number) .. "]" end
     if input.in_search then keystatus_text = keystatus_text .. " Search [" .. input.search_str .. "]" end
 
   end
