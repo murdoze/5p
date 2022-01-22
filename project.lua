@@ -831,8 +831,25 @@ local function change_current_color(args)
   args.fg_bright = args.fg_bright or false
 
   if args.toggle_bold then color.bold = not color.bold end
-  if args.bg_color and args.bg_color >= 0 and args.bg_color <= 7 then color.bg_color = args.bg_color end
-  if args.fg_color and args.fg_color >= 0 and args.fg_color <= 7 then color.fg_color = args.fg_color end
+
+  if args.bg_color then
+    if args.bg_color >= 0 and args.bg_color <= 7 then 
+      color.bg_color = args.bg_color
+    end
+    if args.bg_color == -1 then
+      color.bg_color = (color.bg_color + 1) % 8
+    end
+  end
+
+  if args.fg_color then
+    if args.fg_color >= 0 and args.fg_color <= 7 then 
+      color.fg_color = args.fg_color
+    end
+    if args.fg_color == -1 then
+      color.fg_color = (color.fg_color + 1) % 8
+    end
+  end
+
   color.bg_bright = args.bg_bright
   color.fg_bright = args.fg_bright
 
