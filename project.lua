@@ -1169,8 +1169,6 @@ do
       local func = chord.func
       if func ~= nil then
         func()
-        -- local co = coroutine.create(func)
-	-- coroutine.resume(co)
       end
     end  
 
