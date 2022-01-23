@@ -424,10 +424,14 @@ local function show_items(title, items)
 	s = s .. hl.Off() .. " " 
       end	
       s = s .. hl.Bold() .. related .. hl.Off()
-      if display.view.color_text then
-        s = s .. color
+      if i == display.view.cursor then
+        s = s .. hl.BgCyan() .. hl.BrightWhite() .. hl.Bold()
       else
-        s = s .. hl.Faint()
+        if display.view.color_text then
+          s = s .. color
+        else
+          s = s .. hl.Faint()
+        end
       end
       s = s .. (it.text or '') .. hl.Off()
 
