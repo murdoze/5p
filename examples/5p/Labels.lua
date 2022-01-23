@@ -26,21 +26,34 @@
     text = "Data model"
   },
   [3] = {
+    color = {
+      items = {
+        {
+          id = "id_20220123T063232_631093367",
+          name = "\27[30m\27[41m"
+        }
+      }
+    },
+    id = "id_20220123T063207_728967219",
+    name = "BUG",
+    text = "Bug, not a feature"
+  },
+  [4] = {
     id = "id_20220122T202939_814785663",
     name = "ENVISAGED",
     text = "Thinking about it, but not included in plan yet"
   },
-  [4] = {
+  [5] = {
     id = "id_20220122T203010_728967219",
     name = "PLANNED",
     text = "Planned, but work not started yet"
   },
-  [5] = {
+  [6] = {
     id = "id_20220122T203018_631093367",
     name = "OPEN",
     text = "Open, or In Progress"
   },
-  [6] = {
+  [7] = {
     color = {
       items = {
         {
@@ -52,6 +65,19 @@
     id = "id_20220122T203031_777905755",
     name = "DONE",
     text = "Done task"
+  },
+  [8] = {
+    color = {
+      items = {
+        {
+          id = "id_20220122T200138_814785663",
+          name = "\27[30m\27[43m"
+        }
+      }
+    },
+    id = "id_20220123T063843_631093367",
+    name = "CANCELLED",
+    text = "Cancelled for whatever reason"
   },
   related = {},
   type = "LABEL"

@@ -51,6 +51,19 @@
     name = "CHEVRON",
     text = ""
   },
+  [5] = {
+    color = {
+      items = {
+        {
+          id = "id_20220122T194847_814785663",
+          name = "\27[91m\27[43m"
+        }
+      }
+    },
+    id = "id_20220123T062644_814785663",
+    name = "EXXON",
+    text = ""
+  },
   related = {
     labels = {
       items = {},
