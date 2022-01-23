@@ -590,6 +590,13 @@ local function edit_current_item(field)
   end
 end
 
+local function yank_current_item()
+  local it = get_current_item()
+  if it == nil then return end
+
+  yanked_item = copy_item(it)
+end
+
 local function delete_current_item()
   local cursor = display.view.cursor
   if cursor == nil then return nil end
@@ -623,7 +630,8 @@ local function insert_item(offset)
   index[id] = it
 end
 
-local function paste_item()
+local function paste_item(offset)
+  if not offset then offset = 0 end
   local cursor = display.view.cursor
   if cursor == nil then return nil end
 
@@ -634,8 +642,34 @@ local function paste_item()
   it.text = yanked_item.text
   it.related = copy(yanked_item.related)
 
-  table.insert(display.view.items, cursor, it)
+  table.insert(display.view.items, cursor + offset, it)
   index[id] = it
+end
+
+local function move_item(offset)
+  local cursor = display.view.cursor
+  if cursor == nil then return nil end
+
+  local old_cursor = cursor
+
+  cursor = cursor + offset
+
+  if offset == 1 then
+    -- Special case: when a number is entered, moving to specified location, not down by 1
+    if input.number >= 1 then
+      cursor = input.number
+      if cursor > #display.view.items then cursor = #display.view.items end
+    end
+  end
+  
+  if cursor < 1 or cursor > #display.view.items then return end
+
+  local it = table.remove(display.view.items, old_cursor)
+  if it == nil then return end
+   
+  table.insert(display.view.items, cursor, it)
+
+  display.view.cursor = cursor
 end
 
 -- Selecting items
@@ -1036,9 +1070,14 @@ make_chord{chord = '<END>', func = function() scroll{ to = #display.view.items }
 make_chord{text = '--------------------------------------------'}
 make_chord{chord = 'i', func = function() insert_item(0) end, text = 'Insert item above'}
 make_chord{chord = 'A', func = function() insert_item(1) end, text = 'Insert item below'}
+make_chord{chord = 'y', func = nil, text = 'Yank...', continue = true}
+make_chord{chord = 'yy', func = function() yank_current_item() end, text = 'Yank current item'}
 make_chord{chord = 'd', func = nil, text = 'Delete...', continue = true}
 make_chord{chord = 'dd', func = function() delete_current_item() end, text = 'Delete current item'}
-make_chord{chord = 'p', func = function() paste_item() end, text = 'Paste item'}
+make_chord{chord = 'p', func = function() paste_item() end, text = 'Paste item before'}
+make_chord{chord = 'P', func = function() paste_item(1) end, text = 'Paste item after'}
+make_chord{chord = 'm', func = function() move_item(1); input.number = -1; input.last_number = -1 end, text = 'Move item down/to #'}
+make_chord{chord = 'M', func = function() move_item(-1) end, text = 'Move item up'}
 make_chord{text = '--------------------------------------------'}
 make_chord{chord = 'e', func = function() end, text = 'Edit', continue = true}
 make_chord{chord = 'ea', func = function() edit_all_in_vim() end, text = 'Edit all in Vim'}
