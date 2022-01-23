@@ -423,7 +423,7 @@ local function show_items(title, items)
 	end
 	s = s .. hl.Off() .. " " 
       end	
-      s = s .. hl.Bold() .. related .. hl.Off()
+      s = s .. related .. hl.Off()
       if display.view.color_text then
         s = s .. color
       else
