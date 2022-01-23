@@ -563,6 +563,7 @@ local function copy_item(it)
   r.name = it.name
   r.text = it.text
   r.related = copy(it.related) 
+  r.color = copy(it.color) 
 
   return r
 end
@@ -647,6 +648,7 @@ local function paste_item(offset)
   it.name = yanked_item.name
   it.text = yanked_item.text
   it.related = copy(yanked_item.related)
+  it.color = copy(yanked_item.color)
 
   table.insert(display.view.items, cursor, it)
   
