@@ -1151,7 +1151,7 @@ end
 parse_cmdline(arg)
 
 do
-  local key = 0
+  local key = -1
   local chord = nil
 
   load_data()
@@ -1165,12 +1165,25 @@ do
     display.show_status = function() show_status(); show_keystatus() end
 
     display.draw()
- 
-    key = inkey()
+
+    if key == -1 then
+      -- Startup chord - because we can!
+    else
+      key = inkey()
+    end
 
     status_text = ''
 
-    local chars = chars_for(key)
+    local chars
+
+    if key == -1 then
+      -- Startup chord - yes, it's an ugly hack, but will do for now
+      chars = 'lt' -- List tasks
+      key = 0
+    else
+      chars = chars_for(key)
+    end
+
     local view_chords = nil
     if display.view.chords then
       view_chords = display.view.chords
