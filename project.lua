@@ -635,6 +635,8 @@ local function paste_item(offset)
   local cursor = display.view.cursor
   if cursor == nil then return nil end
 
+  cursor = cursor + offset
+
   local id = genid()
   local it = {}
   it.id = id
@@ -642,8 +644,11 @@ local function paste_item(offset)
   it.text = yanked_item.text
   it.related = copy(yanked_item.related)
 
-  table.insert(display.view.items, cursor + offset, it)
+  table.insert(display.view.items, cursor, it)
+  
   index[id] = it
+
+  display.view.cursor = cursor
 end
 
 local function move_item(offset)
