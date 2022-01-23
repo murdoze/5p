@@ -328,6 +328,9 @@ local function show_keystatus()
 end
 
 local function show_related(items)
+  if items == nil then return "" end
+
+  local items = items.items
   if items == nil or #items == 0 then return "" end
 
   local s = "["
@@ -397,11 +400,11 @@ local function show_items(title, items)
       local related = ""
 
       if it.related ~= nil then
-        related = show_related(it.related.people.items) 
-          .. show_related(it.related.labels.items) 
-          .. show_related(it.related.drones.items) 
-          .. show_related(it.related.customers.items) 
-          .. show_related(it.related.milestones.items)
+        related = show_related(it.related.people) 
+          .. show_related(it.related.labels) 
+          .. show_related(it.related.drones) 
+          .. show_related(it.related.customers) 
+          .. show_related(it.related.milestones)
 
 	if related ~= "" then related = related .. " " end  
       end
