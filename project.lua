@@ -1098,7 +1098,15 @@ make_chord{chord = 'E', func = function() edit_current_item'text' end, text = 'E
 make_chord{text = '--------------------------------------------'}
 make_chord{chord = '/', func = function() input.in_search = true; input.search_str = '' end, text = 'Search'}
 make_chord{chord = '<ENTER>', func = function() handle_enter() end, text = 'Do search! / Accept selection'}
-make_chord{chord = '<ESC>', func = function() handle_escape() end, text = 'Accept selection via escape'}
+make_chord{chord = '<ESC>', func = function() end, text = 'Escape...', continue = true}
+make_chord{chord = '<ESC><ESC>', func = function() handle_escape() end, text = 'Escape!'}
+make_chord{chord = '<ESC>[', func = function() end, text = 'Arrow hold...', continue = true}
+make_chord{chord = '<ESC>[A', func = function() end, text = 'Arrow up hold...'}
+make_chord{chord = '<ESC>[B', func = function() end, text = 'Arrow down hold...'}
+make_chord{chord = '<ESC>[C', func = function() end, text = 'Arrow right hold...'}
+make_chord{chord = '<ESC>[D', func = function() end, text = 'Arrow left hold...'}
+make_chord{chord = '<ESC>[H', func = function() end, text = 'Home hold...'}
+make_chord{chord = '<ESC>[F', func = function() end, text = 'End hold...'}
 make_chord{chord = 'g', func = function() if input.last_number ~= -1 then current_chord = ''; scroll{ to = input.last_number }; input.number = -1; input.last_number = -1 end end, text = 'Go to item #', true}
 make_chord{text = '--------------------------------------------'}
 make_chord{chord = ' ', func = function() choose_items() end, text = 'Choose item(s)'}
@@ -1156,8 +1164,9 @@ do
     display.draw()
  
     key = inkey()
+
     status_text = ''
-    
+
     local chars = chars_for(key)
     local view_chords = nil
     if display.view.chords then
