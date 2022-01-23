@@ -38,6 +38,19 @@
     name = "WORLD",
     text = ""
   },
+  [4] = {
+    color = {
+      items = {
+        {
+          id = "id_20220122T181549_814785663",
+          name = "\27[1m\27[36m\27[101m"
+        }
+      }
+    },
+    id = "id_20220123T052857_728967219",
+    name = "CHEVRON",
+    text = ""
+  },
   related = {
     labels = {
       items = {},
