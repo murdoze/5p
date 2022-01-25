@@ -361,6 +361,73 @@ local function show_related(items)
   return s
 end
 
+local function show_item(it, i, cursor_line, line_index)
+  local current_line = display.list_begin_line + line_index - 1 - display.view.start
+  display.locate(current_line)
+
+  local text = it.text or ''
+
+  local cursor = " "
+  if i == display.view.cursor then
+    cursor = hl.Green() .. hl.Bold() .. ">" .. hl.Off()
+    cursor_line = current_line
+  end
+
+  local selected = " "
+  if display.view.selected ~= nil then
+    for _, sit in ipairs(display.view.selected.items) do
+      if it.id == sit.id then
+          selected = "+"
+        break
+      end
+    end
+  end
+
+  local related = ""
+
+  if it.related ~= nil then
+    related = show_related(it.related.people) 
+      .. show_related(it.related.labels) 
+      .. show_related(it.related.drones) 
+      .. show_related(it.related.customers) 
+      .. show_related(it.related.milestones)
+
+    if related ~= "" then related = related .. " " end  
+  end
+
+  local color = ""
+  if it.color and it.color.items and it.color.items[1] then
+    color = it.color.items[1].name
+  end
+
+  local s = " "
+
+  s = s .. cursor .. selected .. " " .. hl.Yellow() .. string.format("%6d", i) .. hl.Off() .. ". " 
+  if display.view.hide_name then
+  else
+    if display.view.color_name then
+      s = s .. hl.align(color .. (it.name or '?') .. hl.Off(), 20)
+    else
+      s = s .. hl.align(it.name or '?', 20)
+    end
+    s = s .. hl.Off() .. " " 
+  end	
+  s = s .. related .. hl.Off()
+  if display.view.color_text then
+    s = s .. color
+  else
+    if i == display.view.cursor then
+      s = s .. hl.BgCyan() .. hl.BrightWhite() .. hl.Bold()
+    else
+      s = s .. hl.Faint()
+    end
+  end
+  s = s .. text .. hl.Off()
+
+  display.print_line(s)
+
+end
+
 local function show_items(title, items)
   show_title(title)
   display.print("(" .. tostring(#items) .. ")")
@@ -376,72 +443,28 @@ local function show_items(title, items)
 
 
   local cursor_line = -1
+  local line_index = 1
   for i, it in ipairs(items) do
     if i >= display.view.start then
-      local current_line = display.list_begin_line + i - 1 - display.view.start
-      display.locate(current_line)
+      local text = it.text or ''
 
-      local cursor = " "
-      if i == display.view.cursor then
-        cursor = hl.Green() .. hl.Bold() .. ">" .. hl.Off()
-	cursor_line = current_line
-      end
+      local skip = false
 
-      local selected = " "
-      if display.view.selected ~= nil then
-        for _, sit in ipairs(display.view.selected.items) do
-	  if it.id == sit.id then
-	      selected = "+"
-	    break
-	  end
+      if input.search_str ~= '' then
+        skip = true
+        for _ in string.gmatch(text, input.search_str) do
+	  skip = false
+	  break
 	end
       end
 
-      local related = ""
+      if not skip then       
+        show_item(it, i, cursor_line, line_index)
 
-      if it.related ~= nil then
-        related = show_related(it.related.people) 
-          .. show_related(it.related.labels) 
-          .. show_related(it.related.drones) 
-          .. show_related(it.related.customers) 
-          .. show_related(it.related.milestones)
-
-	if related ~= "" then related = related .. " " end  
+        line_index = line_index + 1
+        lines = lines - 1
+        if lines <= 0 then break end
       end
-
-      local color = ""
-      if it.color and it.color.items and it.color.items[1] then
-        color = it.color.items[1].name
-      end
-
-      local s = " "
-
-      s = s .. cursor .. selected .. " " .. hl.Yellow() .. string.format("%6d", i) .. hl.Off() .. ". " 
-      if display.view.hide_name then
-      else
-        if display.view.color_name then
-	  s = s .. hl.align(color .. (it.name or '?') .. hl.Off(), 20)
-	else
-          s = s .. hl.align(it.name or '?', 20)
-	end
-	s = s .. hl.Off() .. " " 
-      end	
-      s = s .. related .. hl.Off()
-      if display.view.color_text then
-        s = s .. color
-      else
-        if i == display.view.cursor then
-          s = s .. hl.BgCyan() .. hl.BrightWhite() .. hl.Bold()
-	else
-          s = s .. hl.Faint()
-	end
-      end
-      s = s .. (it.text or '') .. hl.Off()
-
-      display.print_line(s)
-
-      lines = lines - 1
-      if lines <= 0 then break end
     end
   end
 
@@ -812,8 +835,6 @@ local function handle_enter()
   if input.in_search then
     -- Search
     input.in_search = false
-    print(input.search_str)
-    inkey()
   else
     -- Choosing item(s)
     return_to_prev_view()
@@ -828,8 +849,8 @@ end
 -- Saving and Quitting 
 
 local function quit()
-  print(hl.Reset()())
   print(hl.RestoreScreen()())
+  display.locate(display.height)
   os.exit(0)
 end
 
@@ -1101,7 +1122,7 @@ make_chord{chord = 'E', func = function() edit_current_item'text' end, text = 'E
 make_chord{text = '--------------------------------------------'}
 make_chord{chord = '/', func = function() input.in_search = true; input.search_str = '' end, text = 'Search'}
 make_chord{chord = '<ENTER>', func = function() handle_enter() end, text = 'Do search! / Accept selection'}
-make_chord{chord = '<ESC>', func = function() end, text = 'Escape...', continue = true}
+make_chord{chord = '<ESC>', func = function() input.search_str = ''; input.in_search = false end, text = 'Escape...', continue = true}
 make_chord{chord = '<ESC><ESC>', func = function() handle_escape() end, text = 'Escape!'}
 make_chord{chord = '<ESC>[', func = function() end, text = 'Arrow hold...', continue = true}
 make_chord{chord = '<ESC>[A', func = function() end, text = 'Arrow up hold...'}
@@ -1147,6 +1168,9 @@ local function parse_cmdline(args)
 end
 
 -- Main loop
+print"\27[60T"
+print(hl.SaveScreen()())
+
 
 parse_cmdline(arg)
 
@@ -1155,8 +1179,6 @@ do
   local chord = nil
 
   load_data()
-
-  print(hl.SaveScreen()())
 
   while true do
 
