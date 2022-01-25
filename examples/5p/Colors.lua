@@ -17,9 +17,21 @@
     text = "Bold Bright White on Cyan Background"
   },
   [2] = {
+    bg_bright = false,
+    bg_color = 4,
+    bold = true,
+    color = {
+      items = {
+        {
+          name = "\27[1m\27[33m\27[44m"
+        }
+      }
+    },
+    fg_bright = false,
+    fg_color = 3,
     id = "id_20220123T063843_777905755",
-    name = "",
-    text = ""
+    name = "\27[1m\27[33m\27[44m",
+    text = "Bold Yellow on Blue Background"
   },
   [3] = {
     bg_bright = true,
@@ -121,6 +133,23 @@
     id = "id_20220122T200138_814785663",
     name = "\27[30m\27[43m",
     text = "Black on Yellow Background"
+  },
+  [9] = {
+    bg_bright = true,
+    bg_color = 1,
+    bold = true,
+    color = {
+      items = {
+        {
+          name = "\27[1m\27[37m\27[101m"
+        }
+      }
+    },
+    fg_bright = false,
+    fg_color = 7,
+    id = "id_20220125T235420_814785663",
+    name = "\27[1m\27[37m\27[101m",
+    text = "Bold White on Bright Red Background"
   },
   related = {},
   type = "COLOR"

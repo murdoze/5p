@@ -29,6 +29,19 @@
     color = {
       items = {
         {
+          id = "id_20220123T063843_777905755",
+          name = "\27[1m\27[33m\27[44m"
+        }
+      }
+    },
+    id = "id_20220123T082217_814785663",
+    name = "SYS",
+    text = "System-level feature"
+  },
+  [4] = {
+    color = {
+      items = {
+        {
           id = "id_20220123T063232_631093367",
           name = "\27[30m\27[41m"
         }
@@ -38,22 +51,35 @@
     name = "BUG",
     text = "Bug, not a feature"
   },
-  [4] = {
+  [5] = {
+    color = {
+      items = {
+        {
+          id = "id_20220125T235420_814785663",
+          name = "\27[1m\27[37m\27[101m"
+        }
+      }
+    },
+    id = "id_20220123T074438_728967219",
+    name = "CRITICAL",
+    text = ""
+  },
+  [6] = {
     id = "id_20220122T202939_814785663",
     name = "ENVISAGED",
     text = "Thinking about it, but not included in plan yet"
   },
-  [5] = {
+  [7] = {
     id = "id_20220122T203010_728967219",
     name = "PLANNED",
     text = "Planned, but work not started yet"
   },
-  [6] = {
+  [8] = {
     id = "id_20220122T203018_631093367",
     name = "OPEN",
     text = "Open, or In Progress"
   },
-  [7] = {
+  [9] = {
     color = {
       items = {
         {
@@ -66,7 +92,7 @@
     name = "DONE",
     text = "Done task"
   },
-  [8] = {
+  [10] = {
     color = {
       items = {
         {

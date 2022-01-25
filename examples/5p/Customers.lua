@@ -10,6 +10,17 @@
     },
     id = "id_20220120T130727_814785663",
     name = "MYSELF",
+    related = {
+      labels = {
+        items = {
+          {
+            id = "id_20220123T074438_728967219",
+            name = "CRITICAL"
+          }
+        },
+        multiple = true
+      }
+    },
     text = ""
   },
   [2] = {
@@ -36,6 +47,17 @@
     },
     id = "id_20220120T135833_728967219",
     name = "WORLD",
+    related = {
+      labels = {
+        items = {
+          {
+            id = "id_20220122T202939_814785663",
+            name = "ENVISAGED"
+          }
+        },
+        multiple = true
+      }
+    },
     text = ""
   },
   [4] = {

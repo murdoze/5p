@@ -399,26 +399,262 @@
     text = "Begin/end dates and duration for the task. Handle cases when some are not specified. Infer, or..?"
   },
   [11] = {
+    id = "id_20220123T074352_814785663",
+    name = "",
+    related = {
+      customers = {
+        items = {},
+        multiple = true
+      },
+      drones = {
+        items = {},
+        multiple = true
+      },
+      labels = {
+        items = {
+          {
+            id = "id_20220123T063207_728967219",
+            name = "BUG"
+          },
+          {
+            id = "id_20220123T074438_728967219",
+            name = "CRITICAL"
+          },
+          {
+            id = "id_20220123T082217_814785663",
+            name = "SYS"
+          }
+        },
+        multiple = true
+      },
+      milestones = {
+        items = {},
+        multiple = true
+      },
+      people = {
+        items = {},
+        multiple = false
+      }
+    },
+    text = "In case of a crash try to save data"
+  },
+  [12] = {
+    id = "id_20220123T082437_728967219",
+    name = "",
+    related = {
+      customers = {
+        items = {},
+        multiple = true
+      },
+      drones = {
+        items = {},
+        multiple = true
+      },
+      labels = {
+        items = {
+          {
+            id = "id_20220123T082217_814785663",
+            name = "SYS"
+          },
+          {
+            id = "id_20220122T161748_484018127",
+            name = "DB"
+          }
+        },
+        multiple = true
+      },
+      milestones = {
+        items = {},
+        multiple = true
+      },
+      people = {
+        items = {},
+        multiple = false
+      }
+    },
+    text = "Search"
+  },
+  [13] = {
+    id = "id_20220123T085746_405400070",
+    name = "",
+    related = {
+      customers = {
+        items = {},
+        multiple = true
+      },
+      drones = {
+        items = {},
+        multiple = true
+      },
+      labels = {
+        items = {
+          {
+            id = "id_20220122T161748_484018127",
+            name = "DB"
+          }
+        },
+        multiple = true
+      },
+      milestones = {
+        items = {},
+        multiple = true
+      },
+      people = {
+        items = {},
+        multiple = false
+      }
+    },
+    text = "Filtering and grouping"
+  },
+  [14] = {
+    id = "id_20220123T082534_814785663",
+    name = "",
+    related = {
+      customers = {
+        items = {},
+        multiple = true
+      },
+      drones = {
+        items = {},
+        multiple = true
+      },
+      labels = {
+        items = {
+          {
+            id = "id_20220123T082217_814785663",
+            name = "SYS"
+          }
+        },
+        multiple = true
+      },
+      milestones = {
+        items = {},
+        multiple = true
+      },
+      people = {
+        items = {},
+        multiple = false
+      }
+    },
+    text = "Undo, at least one level, for the last operation. Although, you can always paste back the deleted item..."
+  },
+  [15] = {
+    id = "id_20220123T084935_777905755",
+    name = "",
+    related = {
+      customers = {
+        items = {},
+        multiple = true
+      },
+      drones = {
+        items = {},
+        multiple = true
+      },
+      labels = {
+        items = {
+          {
+            id = "id_20220122T161720_762165127",
+            name = "UI"
+          }
+        },
+        multiple = true
+      },
+      milestones = {
+        items = {},
+        multiple = true
+      },
+      people = {
+        items = {},
+        multiple = false
+      }
+    },
+    text = "Add new color even in select mode (need to add local chords)"
+  },
+  [16] = {
     id = "id_20220123T065646_728967219",
     name = "",
     text = "Task referencing a task -- starts after"
   },
-  [12] = {
+  [17] = {
     id = "id_20220123T065710_631093367",
     name = "",
     text = "Calendar view"
   },
-  [13] = {
+  [18] = {
     id = "id_20220123T065722_777905755",
     name = "",
     text = "Take weekends into consideration when calculating task start date?"
   },
-  [14] = {
+  [19] = {
     id = "id_20220123T065820_172874126",
     name = "",
     text = "Highlight overdue/not started on time tasks"
   },
-  [15] = {
+  [20] = {
+    id = "id_20220123T083024_631093367",
+    name = "",
+    related = {
+      customers = {
+        items = {},
+        multiple = true
+      },
+      drones = {
+        items = {},
+        multiple = true
+      },
+      labels = {
+        items = {
+          {
+            id = "id_20220123T082217_814785663",
+            name = "SYS"
+          }
+        },
+        multiple = true
+      },
+      milestones = {
+        items = {},
+        multiple = true
+      },
+      people = {
+        items = {},
+        multiple = false
+      }
+    },
+    text = "Start Vim in insert mode for empty text"
+  },
+  [21] = {
+    id = "id_20220123T090235_484018127",
+    name = "",
+    related = {
+      customers = {
+        items = {},
+        multiple = true
+      },
+      drones = {
+        items = {},
+        multiple = true
+      },
+      labels = {
+        items = {
+          {
+            id = "id_20220122T161748_484018127",
+            name = "DB"
+          }
+        },
+        multiple = true
+      },
+      milestones = {
+        items = {},
+        multiple = true
+      },
+      people = {
+        items = {},
+        multiple = false
+      }
+    },
+    text = "Show transitive labels - i.e., if a task is labelled with customer, show all customer's labels?"
+  },
+  [22] = {
     id = "id_20220122T161325_777905755",
     name = "",
     related = {
@@ -450,7 +686,7 @@
     },
     text = "Add item type 'Industry' in addition to 'Customer'?"
   },
-  [16] = {
+  [23] = {
     id = "id_20220122T161419_172874126",
     name = "",
     related = {
@@ -482,7 +718,7 @@
     },
     text = "Add task status (envisged, planned, started, done...)?"
   },
-  [17] = {
+  [24] = {
     color = {
       items = {
         id = ""
@@ -519,7 +755,7 @@
     },
     text = "Add possibility to enter custom item types and make the data model absolutely uniform?"
   },
-  [18] = {
+  [25] = {
     id = "id_20220122T161136_728967219",
     name = "",
     related = {
@@ -551,7 +787,7 @@
     },
     text = "Rename 'drones' to 'equipment' to make data model more universal"
   },
-  [19] = {
+  [26] = {
     id = "id_20220121T010737_631093367",
     name = "",
     related = {
@@ -583,7 +819,7 @@
     },
     text = "Multi-line item text support (display long text in a botton text view)"
   },
-  [20] = {
+  [27] = {
     id = "id_20220123T063337_814785663",
     name = "",
     related = {
@@ -619,7 +855,7 @@
     },
     text = "Screen is not restored on quitting. Something with console buffers."
   },
-  [21] = {
+  [28] = {
     id = "id_20220123T063653_814785663",
     name = "",
     related = {
@@ -655,7 +891,7 @@
     },
     text = "Order labels by their order in the list (?)"
   },
-  [22] = {
+  [29] = {
     id = "id_20220123T063139_814785663",
     name = "",
     related = {
@@ -691,7 +927,7 @@
     },
     text = "When hitting 'sc' in label list, crash. To investigate"
   },
-  [23] = {
+  [30] = {
     id = "id_20220122T200627_777905755",
     name = "",
     related = {
