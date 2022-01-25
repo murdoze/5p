@@ -2,7 +2,8 @@
 
 local hl = require'highlight'
 
-local kb = require'kb' -- TODO: rename kb to console
+local console = require'kb'
+local inkey = console.getch
 
 local display = {}
 local view = {}
