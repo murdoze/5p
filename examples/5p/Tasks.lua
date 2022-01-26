@@ -632,6 +632,38 @@
     text = "Changing name of an item is not reflected when it's updated"
   },
   [18] = {
+    id = "id_20220126T014655_814785663",
+    name = "",
+    related = {
+      customers = {
+        items = {},
+        multiple = true
+      },
+      drones = {
+        items = {},
+        multiple = true
+      },
+      labels = {
+        items = {
+          {
+            id = "id_20220122T161720_762165127",
+            name = "UI"
+          }
+        },
+        multiple = true
+      },
+      milestones = {
+        items = {},
+        multiple = true
+      },
+      people = {
+        items = {},
+        multiple = false
+      }
+    },
+    text = "After returning from search filter cursor should stay on the selected item"
+  },
+  [19] = {
     id = "id_20220123T084935_777905755",
     name = "",
     related = {
@@ -663,7 +695,7 @@
     },
     text = "Add new color even in select mode (need to add local chords)"
   },
-  [19] = {
+  [20] = {
     id = "id_20220123T065646_728967219",
     name = "",
     related = {
@@ -699,7 +731,7 @@
     },
     text = "Task referencing a task -- starts after"
   },
-  [20] = {
+  [21] = {
     id = "id_20220123T065710_631093367",
     name = "",
     related = {
@@ -731,7 +763,7 @@
     },
     text = "Calendar view"
   },
-  [21] = {
+  [22] = {
     id = "id_20220123T065722_777905755",
     name = "",
     related = {
@@ -763,7 +795,7 @@
     },
     text = "Take weekends into consideration when calculating task start date?"
   },
-  [22] = {
+  [23] = {
     id = "id_20220123T065820_172874126",
     name = "",
     related = {
@@ -795,7 +827,7 @@
     },
     text = "Highlight overdue/not started on time tasks"
   },
-  [23] = {
+  [24] = {
     id = "id_20220123T083024_631093367",
     name = "",
     related = {
@@ -827,7 +859,7 @@
     },
     text = "Start Vim in insert mode for empty text"
   },
-  [24] = {
+  [25] = {
     id = "id_20220123T085746_405400070",
     name = "",
     related = {
@@ -859,7 +891,7 @@
     },
     text = "Filtering and grouping"
   },
-  [25] = {
+  [26] = {
     id = "id_20220123T090235_484018127",
     name = "TASK22",
     related = {
@@ -891,7 +923,7 @@
     },
     text = "Show transitive labels - i.e., if a task is labelled with customer, show all customer's labels?"
   },
-  [26] = {
+  [27] = {
     id = "id_20220122T161325_777905755",
     name = "",
     related = {
@@ -923,7 +955,7 @@
     },
     text = "Add item type 'Industry' in addition to 'Customer'?"
   },
-  [27] = {
+  [28] = {
     id = "id_20220122T161419_172874126",
     name = "",
     related = {
@@ -955,7 +987,7 @@
     },
     text = "Add task status (envisged, planned, started, done...)?"
   },
-  [28] = {
+  [29] = {
     color = {
       items = {
         id = ""
@@ -992,7 +1024,7 @@
     },
     text = "Add possibility to enter custom item types and make the data model absolutely uniform?"
   },
-  [29] = {
+  [30] = {
     id = "id_20220122T161136_728967219",
     name = "",
     related = {
@@ -1024,7 +1056,7 @@
     },
     text = "Rename 'drones' to 'equipment' to make data model more universal"
   },
-  [30] = {
+  [31] = {
     id = "id_20220121T010737_631093367",
     name = "",
     related = {
@@ -1056,7 +1088,7 @@
     },
     text = "Multi-line item text support (display long text in a botton text view)"
   },
-  [31] = {
+  [32] = {
     id = "id_20220123T063337_814785663",
     name = "",
     related = {
@@ -1092,7 +1124,7 @@
     },
     text = "Screen is not restored on quitting. Something with console buffers."
   },
-  [32] = {
+  [33] = {
     id = "id_20220123T063653_814785663",
     name = "",
     related = {
@@ -1128,7 +1160,7 @@
     },
     text = "Order labels by their order in the list (?)"
   },
-  [33] = {
+  [34] = {
     id = "id_20220122T200627_777905755",
     name = "",
     related = {
