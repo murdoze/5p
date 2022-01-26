@@ -430,6 +430,31 @@ end
 
 local function show_items(title, items)
   show_title(title)
+
+  if input.search_str ~= '' and #input.search_str > 2 then
+    local filtered_items = {}
+    for i, it in ipairs(items) do
+      local text = string.lower(it.text or '')
+      local pattern = string.lower(input.search_str)
+
+      local skip = false
+
+      if input.search_str ~= '' then
+        skip = true
+        for _ in string.gmatch(text, pattern) do
+          skip = false
+          break
+        end
+      end
+
+      if not skip then
+        table.insert(filtered_items, it)
+      end
+    end
+
+    items = filtered_items
+  end
+
   display.print("(" .. tostring(#items) .. ")")
 
   display.view.items = items
@@ -446,25 +471,11 @@ local function show_items(title, items)
   local line_index = 1
   for i, it in ipairs(items) do
     if i >= display.view.start then
-      local text = it.text or ''
+      show_item(it, i, cursor_line, line_index)
 
-      local skip = false
-
-      if input.search_str ~= '' then
-        skip = true
-        for _ in string.gmatch(text, input.search_str) do
-	  skip = false
-	  break
-	end
-      end
-
-      if not skip then       
-        show_item(it, i, cursor_line, line_index)
-
-        line_index = line_index + 1
-        lines = lines - 1
-        if lines <= 0 then break end
-      end
+      line_index = line_index + 1
+      lines = lines - 1
+      if lines <= 0 then break end
     end
   end
 
