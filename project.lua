@@ -315,7 +315,7 @@ end
 local function show_header()
   show_ruler()
   display.locate(display.header_line - 1)
-  display.print(" 5p: Personal Portable Project Planning Pentagram or Personal Jira or Vim for Pro{duct,ject} Planning and Management ")
+  display.print(" 5p: Personal Portable Project Planning Pseudovim")
 end
 
 local function show_line_numbers()
@@ -1128,7 +1128,7 @@ make_chord{text = '--------------------------------------------'}
 make_chord{chord = 'q', func = nil, text = "Quit", continue = true}
 make_chord{chord = 'qq', func = save_and_quit, text = "Save and quit"}
 make_chord{chord = '<^Q>', func = save_and_quit, text = "Save and quit"}
-make_chord{chord = 'Z', func = nil, text = "Save and quit...", true}
+make_chord{chord = 'Z', func = nil, text = "Save and quit...", continue = true}
 make_chord{chord = 'ZZ', func = save_and_quit, text = "...Vim style"}
 make_chord{chord = 'q!', func = quit_no_save, text = "Quit without saving"}
 make_chord{chord = '<^S>', func = save_data, text = "Save data"}
