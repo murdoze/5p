@@ -762,6 +762,8 @@ local function select(args)
   local multiselect = args.multiselect or false
   local selected = args.selected
 
+  if selected == nil then return end
+
   local hide_name = args.hide_name
   local color_name = args.color_name
   local color_text = args.color_text
@@ -1231,7 +1233,13 @@ do
     display.show_header = show_header
     display.show_status = function() show_status(); show_keystatus() end
 
-    display.draw()
+    xpcall(display.draw,
+      function(err)
+        print()
+        print(hl.Bold() .. hl.Red() .. "CRASH ON DISPLAY!" .. hl.Off())
+        print(err)
+	inkey()
+      end)
 
     if key == -1 then
       -- Startup chord - because we can!
@@ -1260,8 +1268,14 @@ do
     if chord ~= nil then
       local func = chord.func
       if func ~= nil then
-        func()
-      end
+        xpcall(func,
+          function(err)
+            print()
+            print(hl.Bold() .. hl.Red() .. "CRASH ON FUNCTION!" .. hl.Off())
+            print(err)
+            inkey()
+	  end)
+       end
     end  
 
     local hlKey = hl.Bold() .. hl.BrightGreen() .. hl.BgBlack()
