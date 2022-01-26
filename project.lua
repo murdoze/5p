@@ -327,6 +327,25 @@ local function show_keystatus()
   display.print_line(hl.White() .. hl.BgBlue() .. keystatus_text)
 end
 
+local function get_related_str(items)
+  if items == nil then return "" end
+
+  local items = items.items
+  if items == nil or #items == 0 then return "" end
+
+  local s = "|"
+
+  for i, item in ipairs(items) do
+    if i > 1 then s = s .. "|" end
+
+    s = s .. item.name
+  end
+
+  s = s .. "|"
+
+  return s
+end
+
 local function show_related(items)
   if items == nil then return "" end
 
@@ -431,20 +450,27 @@ end
 local function show_items(title, items)
   show_title(title)
 
-  if input.search_str ~= '' and #input.search_str > 2 then
+  if input.search_str ~= '' and #input.search_str > 1 then
     local filtered_items = {}
+
     for i, it in ipairs(items) do
-      local text = string.lower(it.text or '')
+      local related_str = ''
+
+      if it.related ~= nil then
+        related_str = get_related_str(it.related.people) 
+          .. get_related_str(it.related.labels) 
+          .. get_related_str(it.related.drones) 
+          .. get_related_str(it.related.customers) 
+          .. get_related_str(it.related.milestones)
+      end	
+      local text = string.lower(related_str) .. string.lower(it.text or '')
       local pattern = string.lower(input.search_str)
 
-      local skip = false
+      local skip = true
 
-      if input.search_str ~= '' then
-        skip = true
-        for _ in string.gmatch(text, pattern) do
-          skip = false
-          break
-        end
+      for _ in string.gmatch(text, pattern) do
+        skip = false
+        break
       end
 
       if not skip then
