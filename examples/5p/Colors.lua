@@ -151,6 +151,23 @@
     name = "\27[1m\27[37m\27[101m",
     text = "Bold White on Bright Red Background"
   },
+  [10] = {
+    bg_bright = false,
+    bg_color = 0,
+    bold = false,
+    color = {
+      items = {
+        {
+          name = "\27[32m\27[40m"
+        }
+      }
+    },
+    fg_bright = false,
+    fg_color = 2,
+    id = "id_20220126T011425_631093367",
+    name = "\27[32m\27[40m",
+    text = "Green on Black Background"
+  },
   related = {},
   type = "COLOR"
 }

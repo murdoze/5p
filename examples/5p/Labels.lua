@@ -10,6 +10,7 @@
     },
     id = "id_20220122T161720_762165127",
     name = "UI",
+    related = {},
     text = "User interface"
   },
   [2] = {
@@ -35,10 +36,23 @@
       }
     },
     id = "id_20220123T082217_814785663",
-    name = "SYS",
+    name = "SYSTEM",
     text = "System-level feature"
   },
   [4] = {
+    color = {
+      items = {
+        {
+          id = "id_20220126T011425_631093367",
+          name = "\27[32m\27[40m"
+        }
+      }
+    },
+    id = "id_20220126T011406_728967219",
+    name = "CALENDAR",
+    text = ""
+  },
+  [5] = {
     color = {
       items = {
         {
@@ -51,7 +65,7 @@
     name = "BUG",
     text = "Bug, not a feature"
   },
-  [5] = {
+  [6] = {
     color = {
       items = {
         {
@@ -64,22 +78,22 @@
     name = "CRITICAL",
     text = ""
   },
-  [6] = {
+  [7] = {
     id = "id_20220122T202939_814785663",
     name = "ENVISAGED",
     text = "Thinking about it, but not included in plan yet"
   },
-  [7] = {
+  [8] = {
     id = "id_20220122T203010_728967219",
     name = "PLANNED",
     text = "Planned, but work not started yet"
   },
-  [8] = {
+  [9] = {
     id = "id_20220122T203018_631093367",
     name = "OPEN",
     text = "Open, or In Progress"
   },
-  [9] = {
+  [10] = {
     color = {
       items = {
         {
@@ -90,9 +104,10 @@
     },
     id = "id_20220122T203031_777905755",
     name = "DONE",
+    related = {},
     text = "Done task"
   },
-  [10] = {
+  [11] = {
     color = {
       items = {
         {

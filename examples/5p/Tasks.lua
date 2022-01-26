@@ -331,114 +331,6 @@
     text = "When holding arrows keys, strange thing happen -- new lines are inserted, screens switched. To explore."
   },
   [9] = {
-    id = "id_20220122T200449_728967219",
-    name = "",
-    related = {
-      customers = {
-        items = {},
-        multiple = true
-      },
-      drones = {
-        items = {},
-        multiple = true
-      },
-      labels = {
-        items = {
-          {
-            id = "id_20220122T161748_484018127",
-            name = "DB"
-          },
-          {
-            id = "id_20220123T063843_631093367",
-            name = "CANCELLED"
-          }
-        },
-        multiple = true
-      },
-      milestones = {
-        items = {},
-        multiple = true
-      },
-      people = {
-        items = {},
-        multiple = false
-      }
-    },
-    text = "Remove deleted related items"
-  },
-  [10] = {
-    id = "id_20220123T065532_814785663",
-    name = "",
-    related = {
-      customers = {
-        items = {},
-        multiple = true
-      },
-      drones = {
-        items = {},
-        multiple = true
-      },
-      labels = {
-        items = {
-          {
-            id = "id_20220122T161748_484018127",
-            name = "DB"
-          }
-        },
-        multiple = true
-      },
-      milestones = {
-        items = {},
-        multiple = true
-      },
-      people = {
-        items = {},
-        multiple = false
-      }
-    },
-    text = "Begin/end dates and duration for the task. Handle cases when some are not specified. Infer, or..?"
-  },
-  [11] = {
-    id = "id_20220123T074352_814785663",
-    name = "",
-    related = {
-      customers = {
-        items = {},
-        multiple = true
-      },
-      drones = {
-        items = {},
-        multiple = true
-      },
-      labels = {
-        items = {
-          {
-            id = "id_20220123T063207_728967219",
-            name = "BUG"
-          },
-          {
-            id = "id_20220123T074438_728967219",
-            name = "CRITICAL"
-          },
-          {
-            id = "id_20220123T082217_814785663",
-            name = "SYS"
-          }
-        },
-        multiple = true
-      },
-      milestones = {
-        items = {},
-        multiple = true
-      },
-      people = {
-        items = {},
-        multiple = false
-      }
-    },
-    text = "In case of a crash try to save data"
-  },
-  [12] = {
     id = "id_20220123T082437_728967219",
     name = "",
     related = {
@@ -478,8 +370,8 @@
     },
     text = "Search"
   },
-  [13] = {
-    id = "id_20220123T085746_405400070",
+  [10] = {
+    id = "id_20220123T074352_814785663",
     name = "",
     related = {
       customers = {
@@ -493,8 +385,20 @@
       labels = {
         items = {
           {
-            id = "id_20220122T161748_484018127",
-            name = "DB"
+            id = "id_20220123T063207_728967219",
+            name = "BUG"
+          },
+          {
+            id = "id_20220123T074438_728967219",
+            name = "CRITICAL"
+          },
+          {
+            id = "id_20220123T082217_814785663",
+            name = "SYS"
+          },
+          {
+            id = "id_20220122T203031_777905755",
+            name = "DONE"
           }
         },
         multiple = true
@@ -508,9 +412,9 @@
         multiple = false
       }
     },
-    text = "Filtering and grouping"
+    text = "In case of a crash try to save data"
   },
-  [14] = {
+  [11] = {
     id = "id_20220126T005756_814785663",
     name = "",
     related = {
@@ -527,6 +431,10 @@
           {
             id = "id_20220123T063207_728967219",
             name = "BUG"
+          },
+          {
+            id = "id_20220122T203031_777905755",
+            name = "DONE"
           }
         },
         multiple = true
@@ -542,7 +450,124 @@
     },
     text = "Handle invalid patern entered in search string, like ( or ["
   },
+  [12] = {
+    id = "id_20220123T063139_814785663",
+    name = "",
+    related = {
+      customers = {
+        items = {},
+        multiple = true
+      },
+      drones = {
+        items = {},
+        multiple = true
+      },
+      labels = {
+        items = {
+          {
+            id = "id_20220122T161720_762165127",
+            name = "UI"
+          },
+          {
+            id = "id_20220123T063207_728967219",
+            name = "BUG"
+          },
+          {
+            id = "id_20220122T203031_777905755",
+            name = "DONE"
+          }
+        },
+        multiple = true
+      },
+      milestones = {
+        items = {},
+        multiple = true
+      },
+      people = {
+        items = {},
+        multiple = false
+      }
+    },
+    text = "When hitting 'sc' in label list, crash. lc sp -- crash. Seleced items nil. To investigate"
+  },
+  [13] = {
+    id = "id_20220122T200449_728967219",
+    name = "",
+    related = {
+      customers = {
+        items = {},
+        multiple = true
+      },
+      drones = {
+        items = {},
+        multiple = true
+      },
+      labels = {
+        items = {
+          {
+            id = "id_20220122T161748_484018127",
+            name = "DB"
+          },
+          {
+            id = "id_20220123T063843_631093367",
+            name = "CANCELLED"
+          }
+        },
+        multiple = true
+      },
+      milestones = {
+        items = {},
+        multiple = true
+      },
+      people = {
+        items = {},
+        multiple = false
+      }
+    },
+    text = "Remove deleted related items"
+  },
+  [14] = {
+    id = "id_20220126T012332_728967219",
+    name = "",
+    text = ""
+  },
   [15] = {
+    id = "id_20220123T065532_814785663",
+    name = "",
+    related = {
+      customers = {
+        items = {},
+        multiple = true
+      },
+      drones = {
+        items = {},
+        multiple = true
+      },
+      labels = {
+        items = {
+          {
+            id = "id_20220122T161748_484018127",
+            name = "DB"
+          },
+          {
+            id = "id_20220126T011406_728967219",
+            name = "CALENDAR"
+          }
+        },
+        multiple = true
+      },
+      milestones = {
+        items = {},
+        multiple = true
+      },
+      people = {
+        items = {},
+        multiple = false
+      }
+    },
+    text = "Begin/end dates and duration for the task. Handle cases when some are not specified. Infer, or..?"
+  },
+  [16] = {
     id = "id_20220123T082534_814785663",
     name = "",
     related = {
@@ -574,7 +599,39 @@
     },
     text = "Undo, at least one level, for the last operation. Although, you can always paste back the deleted item..."
   },
-  [16] = {
+  [17] = {
+    id = "id_20220126T011124_814785663",
+    name = "",
+    related = {
+      customers = {
+        items = {},
+        multiple = true
+      },
+      drones = {
+        items = {},
+        multiple = true
+      },
+      labels = {
+        items = {
+          {
+            id = "id_20220123T082217_814785663",
+            name = "SYSTEM"
+          }
+        },
+        multiple = true
+      },
+      milestones = {
+        items = {},
+        multiple = true
+      },
+      people = {
+        items = {},
+        multiple = false
+      }
+    },
+    text = "Changing name of an item is not reflected when it's updated"
+  },
+  [18] = {
     id = "id_20220123T084935_777905755",
     name = "",
     related = {
@@ -606,7 +663,7 @@
     },
     text = "Add new color even in select mode (need to add local chords)"
   },
-  [17] = {
+  [19] = {
     id = "id_20220123T065646_728967219",
     name = "",
     related = {
@@ -623,6 +680,10 @@
           {
             id = "id_20220122T161748_484018127",
             name = "DB"
+          },
+          {
+            id = "id_20220126T011406_728967219",
+            name = "CALENDAR"
           }
         },
         multiple = true
@@ -638,22 +699,103 @@
     },
     text = "Task referencing a task -- starts after"
   },
-  [18] = {
+  [20] = {
     id = "id_20220123T065710_631093367",
     name = "",
+    related = {
+      customers = {
+        items = {},
+        multiple = true
+      },
+      drones = {
+        items = {},
+        multiple = true
+      },
+      labels = {
+        items = {
+          {
+            id = "id_20220126T011406_728967219",
+            name = "CALENDAR"
+          }
+        },
+        multiple = true
+      },
+      milestones = {
+        items = {},
+        multiple = true
+      },
+      people = {
+        items = {},
+        multiple = false
+      }
+    },
     text = "Calendar view"
   },
-  [19] = {
+  [21] = {
     id = "id_20220123T065722_777905755",
     name = "",
+    related = {
+      customers = {
+        items = {},
+        multiple = true
+      },
+      drones = {
+        items = {},
+        multiple = true
+      },
+      labels = {
+        items = {
+          {
+            id = "id_20220126T011406_728967219",
+            name = "CALENDAR"
+          }
+        },
+        multiple = true
+      },
+      milestones = {
+        items = {},
+        multiple = true
+      },
+      people = {
+        items = {},
+        multiple = false
+      }
+    },
     text = "Take weekends into consideration when calculating task start date?"
   },
-  [20] = {
+  [22] = {
     id = "id_20220123T065820_172874126",
     name = "",
+    related = {
+      customers = {
+        items = {},
+        multiple = true
+      },
+      drones = {
+        items = {},
+        multiple = true
+      },
+      labels = {
+        items = {
+          {
+            id = "id_20220126T011406_728967219",
+            name = "CALENDAR"
+          }
+        },
+        multiple = true
+      },
+      milestones = {
+        items = {},
+        multiple = true
+      },
+      people = {
+        items = {},
+        multiple = false
+      }
+    },
     text = "Highlight overdue/not started on time tasks"
   },
-  [21] = {
+  [23] = {
     id = "id_20220123T083024_631093367",
     name = "",
     related = {
@@ -685,9 +827,41 @@
     },
     text = "Start Vim in insert mode for empty text"
   },
-  [22] = {
-    id = "id_20220123T090235_484018127",
+  [24] = {
+    id = "id_20220123T085746_405400070",
     name = "",
+    related = {
+      customers = {
+        items = {},
+        multiple = true
+      },
+      drones = {
+        items = {},
+        multiple = true
+      },
+      labels = {
+        items = {
+          {
+            id = "id_20220122T161748_484018127",
+            name = "DB"
+          }
+        },
+        multiple = true
+      },
+      milestones = {
+        items = {},
+        multiple = true
+      },
+      people = {
+        items = {},
+        multiple = false
+      }
+    },
+    text = "Filtering and grouping"
+  },
+  [25] = {
+    id = "id_20220123T090235_484018127",
+    name = "TASK22",
     related = {
       customers = {
         items = {},
@@ -717,7 +891,7 @@
     },
     text = "Show transitive labels - i.e., if a task is labelled with customer, show all customer's labels?"
   },
-  [23] = {
+  [26] = {
     id = "id_20220122T161325_777905755",
     name = "",
     related = {
@@ -749,7 +923,7 @@
     },
     text = "Add item type 'Industry' in addition to 'Customer'?"
   },
-  [24] = {
+  [27] = {
     id = "id_20220122T161419_172874126",
     name = "",
     related = {
@@ -781,7 +955,7 @@
     },
     text = "Add task status (envisged, planned, started, done...)?"
   },
-  [25] = {
+  [28] = {
     color = {
       items = {
         id = ""
@@ -818,7 +992,7 @@
     },
     text = "Add possibility to enter custom item types and make the data model absolutely uniform?"
   },
-  [26] = {
+  [29] = {
     id = "id_20220122T161136_728967219",
     name = "",
     related = {
@@ -850,7 +1024,7 @@
     },
     text = "Rename 'drones' to 'equipment' to make data model more universal"
   },
-  [27] = {
+  [30] = {
     id = "id_20220121T010737_631093367",
     name = "",
     related = {
@@ -882,7 +1056,7 @@
     },
     text = "Multi-line item text support (display long text in a botton text view)"
   },
-  [28] = {
+  [31] = {
     id = "id_20220123T063337_814785663",
     name = "",
     related = {
@@ -918,7 +1092,7 @@
     },
     text = "Screen is not restored on quitting. Something with console buffers."
   },
-  [29] = {
+  [32] = {
     id = "id_20220123T063653_814785663",
     name = "",
     related = {
@@ -954,43 +1128,7 @@
     },
     text = "Order labels by their order in the list (?)"
   },
-  [30] = {
-    id = "id_20220123T063139_814785663",
-    name = "",
-    related = {
-      customers = {
-        items = {},
-        multiple = true
-      },
-      drones = {
-        items = {},
-        multiple = true
-      },
-      labels = {
-        items = {
-          {
-            id = "id_20220122T161720_762165127",
-            name = "UI"
-          },
-          {
-            id = "id_20220123T063207_728967219",
-            name = "BUG"
-          }
-        },
-        multiple = true
-      },
-      milestones = {
-        items = {},
-        multiple = true
-      },
-      people = {
-        items = {},
-        multiple = false
-      }
-    },
-    text = "When hitting 'sc' in label list, crash. To investigate"
-  },
-  [31] = {
+  [33] = {
     id = "id_20220122T200627_777905755",
     name = "",
     related = {
