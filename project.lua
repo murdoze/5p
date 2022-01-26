@@ -82,7 +82,9 @@ end
 -- Status
 
 local status_text = 'Status normal'
+
 local keystatus_text = 'Key status normal'
+local hlKeyStatus = hl.Off() .. hl.White() .. hl.BgBlue()
 
 -- Project
 
@@ -313,7 +315,7 @@ end
 local function show_header()
   show_ruler()
   display.locate(display.header_line - 1)
-  display.print(" 5p: Personal Portable Project Planning Pentagram or Personal Jira ")
+  display.print(" 5p: Personal Portable Project Planning Pentagram or Personal Jira or Vim for Pro{duct,ject} Planning and Management ")
 end
 
 local function show_line_numbers()
@@ -330,7 +332,7 @@ end
 
 local function show_keystatus()
   display.locate(display.keystatus_line)
-  display.print_line(hl.White() .. hl.BgBlue() .. keystatus_text)
+  display.print_line(hlKeyStatus .. keystatus_text)
 end
 
 local function get_related_str(items)
@@ -1262,9 +1264,10 @@ do
       end
     end  
 
-    keystatus_text = "Chord .. [" .. last_chord .. "] Key [" .. tostring(key) .. "]"
-    if input.number ~= -1 then keystatus_text = keystatus_text .. " Number [" .. tostring(input.number) .. "]" end
-    if input.in_search then keystatus_text = keystatus_text .. " Search [" .. input.search_str .. "]" end
+    local hlKey = hl.Bold() .. hl.BrightGreen() .. hl.BgBlack()
+    keystatus_text = "Chord .. [" .. hlKey .. last_chord .. hlKeyStatus .. "] Key [" .. hlKey .. tostring(key) .. hlKeyStatus .. "]"
+    if input.number ~= -1 then keystatus_text = keystatus_text .. " Number [" .. hlKey .. tostring(input.number) .. hlKeyStatus .. "]" end
+    if input.in_search then keystatus_text = keystatus_text .. " Search [" .. hlKey .. input.search_str .. hlKeyStatus .."]" end
 
   end
 end
