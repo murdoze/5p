@@ -186,6 +186,11 @@ local function chars_for(key)
         if key >= 32 and key <= 255 then
           input.search_str = input.search_str .. string.char(key)
 	end
+	if key == 263 then -- DEL. TODO: Support on Windows
+	  if #input.search_str > 0 then
+	    input.search_str = string.sub(input.search_str, 1, #input.search_str - 1)
+	  end
+	end
       end  
       return ''
     end  
@@ -222,6 +227,7 @@ local function chars_for(key)
       [258] = '<DOWN>',
       [339] = '<PGUP>',
       [338] = '<PGDOWN>',
+      [263] = '<DEL>',
     }
    end
 
